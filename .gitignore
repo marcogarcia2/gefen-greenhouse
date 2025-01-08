@@ -1,0 +1,23 @@
+# Arquivos gerados pelo Android Studio
+.idea/
+*.iml
+.gradle/
+build/
+captures/
+
+# Configurações locais
+local.properties
+
+# Arquivos gerados automaticamente
+*.apk
+*.dex
+*.log
+
+# Diretório do wrapper do Gradle
+!gradle/wrapper/gradle-wrapper.properties
+.gradle/
+
+# Outros
+.DS_Store
+.idea/
+local.properties
