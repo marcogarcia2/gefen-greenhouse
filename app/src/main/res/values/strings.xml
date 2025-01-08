@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">gefen-greenhouse</string>
+    <string name="titulo">Home</string>
+    <string name="descricao">Aplicativo de monitoramento da bomba de água da estufa do <b><b>GEFEN - CENA/USP</b></b></string>
+    <string name="bold_descricao">GEFEN - CENA/USP</string>
+    <string name="sucesso"><font color="#4BAE4F">Sucesso</font></string>
+    <string name="falhou"><font color="#FF4141">Falhou</font></string>
+    <string name="aguardando"><font color="ABABAB">Aguardando</font></string>
+</resources>
+

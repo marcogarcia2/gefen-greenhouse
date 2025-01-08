@@ -1,0 +1,17 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Sombra -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#55000000" /> <!-- Cor da sombra -->
+        </shape>
+    </item>
+
+    <!-- Retângulo Branco -->
+    <item android:bottom="4dp" android:right="2dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#FFFFFF" /> <!-- Cor do retângulo -->
+        </shape>
+    </item>
+</layer-list>
