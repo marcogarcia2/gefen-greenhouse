@@ -1,0 +1,4 @@
+*.java linguist-detectable=false
+/build/** linguist-detectable=false
+
+*.kt linguist-detectable=true
