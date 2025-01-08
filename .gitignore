@@ -17,5 +17,8 @@ local.properties
 !gradle/wrapper/gradle-wrapper.properties
 .gradle/
 
+# Arquivos com informações sensíveis
+*secret.h
+
 # Outros
 .DS_Store
