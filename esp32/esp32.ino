@@ -6,17 +6,14 @@
 const int pin = 34;
 
 // Horários de operação (em segundos desde meia-noite) e 
-// const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
 const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
+// const int irrigationTimes[3] = {22 * 3600 + 22 * 60, 22 * 3600 + 26 * 60, 22 * 3600 + 30 * 60}; // Testes
 
 // Margem de tempo, 5 minutos antes do funcionamento da bomba
 const int offset = 5 * 60;
 
 // Variável de tempo atual
 tm timeinfo;
-
-// Índice persistente entre reboots
-RTC_DATA_ATTR int timePointer = 0;
 
 
 // --- PROGRAMA PRINCIPAL --- //
@@ -51,7 +48,6 @@ void setup() {
   for (int i = 0; i < 3; i++){
     if (currentTime < irrigationTimes[i]){
       nextTime = irrigationTimes[i];
-      Serial.printf("nextTime = %d\n", nextTime);
       break;
     }
   }
@@ -72,10 +68,20 @@ void setup() {
   Serial.println("Acabou, vou voltar a dormir.");
 
   // Por fim, precisamos dormir até a próxima hora ou até a meia-noite.
+
+  // Pegando o horário atual
+  if (getLocalTime(&timeinfo)) {
+    currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+  }
+  else{
+    deepSleepUntilMidnight();
+  } 
+
+  // Calculando o próximo horário
   nextTime = -1;
   for (int i = 0; i < 3; i++){
     if (currentTime < irrigationTimes[i]){
-      int nextTime = irrigationTimes[i];
+      nextTime = irrigationTimes[i];
       break;
     }
   }
@@ -83,11 +89,9 @@ void setup() {
   // Dormir até a hora determinada
   if(nextTime == -1){
     deepSleepUntilMidnight();
-    Serial.println("Está tarde, vou dormir até meia noite...");
   }
   else{
     int sleepTime = nextTime - offset - currentTime;
-    Serial.printf("Hoje ainda tem trabalho, vou dormir por %d segundos...\n", sleepTime);
     deepSleep(sleepTime);
   }
 
@@ -116,7 +120,6 @@ void collectData(int final) {
   }
 
 }
-
 
 void loop(){
     // Não utilizado porque estamos usando deep sleep

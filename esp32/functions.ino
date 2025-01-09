@@ -33,10 +33,11 @@ void deepSleep(int sleepTime){
 
 // Função para dormir até a meia-noite do próximo dia
 void deepSleepUntilMidnight() {
+  
   int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
   int sleepTime = 24 * 3600 - currentTime;
+  Serial.printf("Dormindo até a meia-note, por %d segundos...\n", sleepTime);
 
-  Serial.printf("Dormindo até meia-noite, %d segundos...\n", sleepTime);
   esp_sleep_enable_timer_wakeup(sleepTime * 1000000LL);
   esp_deep_sleep_start();
   return;
