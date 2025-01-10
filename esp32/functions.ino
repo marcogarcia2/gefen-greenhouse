@@ -1,25 +1,28 @@
-#include <WiFi.h>
-#include "secret.h"
+#include <time.h>
 
-// Função que conecta-se ao wifi
-void connectWiFi() {
-  WiFi.begin(ssid, password);
-  Serial.print("Conectando ao WiFi...");
-  
-  int attempts = 0; // Contador de tentativas
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) { // 20 tentativas (~10 segundos)
+// Função que coleta e processa dados do sensor
+char collectData(int final) {
+
+  int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+
+  while (currentTime < final) {
+
+    int value = analogRead(pin);
+    Serial.printf("Valor lido pelo sensor: %d\n", value);
     delay(500);
-    Serial.print(".");
-    attempts++;
+
+    // Atualiza o tempo atual
+    if (getLocalTime(&timeinfo)) {
+      currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+    } 
+    else {
+      Serial.println("Erro ao atualizar o tempo!");
+      return 'f';
+    }
+
   }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nWiFi conectado!");
-    Serial.print("IP: ");
-    Serial.println(WiFi.localIP());
-  } else {
-    Serial.println("\nErro ao conectar ao WiFi!");
-  }
+
+  return 's';
 }
 
 // Função para colocar ESP32 em deep sleep por um tempo determinado
@@ -42,3 +45,41 @@ void deepSleepUntilMidnight() {
   esp_deep_sleep_start();
   return;
 }
+
+// Função que obtém a data de hoje no formato "YYYY-MM-DD"
+char* getDate() {
+  struct tm timeinfo;
+
+  // Atualiza as informações de tempo local
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Erro ao obter o horário local!");
+    return nullptr; // Retorna null em caso de erro
+  }
+
+  // Aloca memória para armazenar a data
+  static char date[11]; // "YYYY-MM-DD" + null terminator
+
+  // Formata a data como "YYYY-MM-DD"
+  snprintf(date, sizeof(date), "%04d-%02d-%02d", 
+           timeinfo.tm_year + 1900, // Ano desde 1900
+           timeinfo.tm_mon + 1,     // Mês (0 a 11, por isso adicionamos 1)
+           timeinfo.tm_mday);       // Dia do mês
+
+  return date; // Retorna o ponteiro para a string formatada
+}
+
+// Função que obtém o horário no formato "HH:MM"
+char* getTime(int timeInSeconds) {
+  // Calcula horas e minutos
+  int hours = timeInSeconds / 3600;
+  int minutes = (timeInSeconds % 3600) / 60;
+
+  // Aloca memória para a string do tempo no formato "hh:mm"
+  char* newTime = new char[6]; // "hh:mm" + null terminator
+  
+  // Formata o tempo como "hh:mm"
+  snprintf(newTime, 6, "%02d:%02d", hours, minutes);
+
+  return newTime;
+}
+

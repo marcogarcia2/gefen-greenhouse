@@ -6,11 +6,12 @@
 const int pin = 34;
 
 // Horários de operação (em segundos desde meia-noite) e 
-const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
-// const int irrigationTimes[3] = {22 * 3600 + 22 * 60, 22 * 3600 + 26 * 60, 22 * 3600 + 30 * 60}; // Testes
+// const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
+const int irrigationTimes[3] = {12 * 3600 + 23 * 60, 12 * 3600 + 30 * 60, 12 * 3600 + 37 * 60}; // Testes
 
 // Margem de tempo, 5 minutos antes do funcionamento da bomba
-const int offset = 5 * 60;
+// const int offset = 5 * 60;
+const int offset = 1 * 60;
 
 // Variável de tempo atual
 tm timeinfo;
@@ -64,7 +65,22 @@ void setup() {
 
   // 3. Está na hora certa, vamos coletar os dados
   Serial.println("Chegou a hora! Vou coletar os dados do sensor.");
-  collectData(nextTime + offset);
+  char result = collectData(nextTime + offset);
+
+  // Agora precisamos enviar o dado coletado ao BD
+  if (result == 's'){
+    Serial.println("Sucesso! Enviando dados ao servidor...");
+  }
+  else if (result == 'f'){
+    Serial.println("Falhou! Enviando dados ao servidor...");
+  }
+  else {
+    Serial.println("Falha no sensor! Enviando dados ao servidor...");
+  }
+
+  insertData(nextTime, result);
+  
+  // Firebase.begin(firebase_host, firebase_auth);
   Serial.println("Acabou, vou voltar a dormir.");
 
   // Por fim, precisamos dormir até a próxima hora ou até a meia-noite.
@@ -97,29 +113,7 @@ void setup() {
 
 }
 
-// Função que coleta dados do sensor
-void collectData(int final) {
 
-  int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
-
-  while (currentTime < final) {
-
-    int value = analogRead(pin);
-    Serial.printf("Valor lido pelo sensor: %d\n", value);
-    delay(500);
-
-    // Atualiza o tempo atual
-    if (getLocalTime(&timeinfo)) {
-      currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
-    } 
-    else {
-      Serial.println("Erro ao atualizar o tempo!");
-      break;
-    }
-
-  }
-
-}
 
 void loop(){
     // Não utilizado porque estamos usando deep sleep
