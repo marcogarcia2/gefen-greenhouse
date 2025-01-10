@@ -6,12 +6,12 @@
 const int pin = 34;
 
 // Horários de operação (em segundos desde meia-noite) e 
-// const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
-const int irrigationTimes[3] = {12 * 3600 + 23 * 60, 12 * 3600 + 30 * 60, 12 * 3600 + 37 * 60}; // Testes
+const int irrigationTimes[3] = {8 * 3600, 14 * 3600, 19 * 3600}; // 08:00, 14:00, 19:00
+// const int irrigationTimes[3] = {12 * 3600 + 23 * 60, 12 * 3600 + 30 * 60, 12 * 3600 + 37 * 60}; // Testes
 
 // Margem de tempo, 5 minutos antes do funcionamento da bomba
-// const int offset = 5 * 60;
-const int offset = 1 * 60;
+const int offset = 5 * 60;
+// const int offset = 1 * 60;
 
 // Variável de tempo atual
 tm timeinfo;
