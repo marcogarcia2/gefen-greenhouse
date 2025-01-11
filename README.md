@@ -23,22 +23,30 @@ Foi aí que meu amigo Gus entrou em contato comigo. Ele relatou que por vezes es
 
 Ele me pediu para desenvolver uma solução, que através de um aplicativo de celular, avisasse se a bomba funcionou ou não. Com isso, caso o sistema da bomba falhasse, ele seria avisado e o experimento seria salvo. Então essa foi a hora de colocar meus conhecimentos em prática... ou não. 
 
-## Descrevendo a solução
+## Visão geral da solução
 É importante ressaltar que eu nunca havia feito um projeto grande como esse antes. Muito do que eu utilizei no projeto eu não aprendi explicitamente na faculdade, acabei descobrindo através de pesquisa de projetos semelhantes.
 
-O sistema embarcado constitui-se de uma ESP32 conectada a um sensor de fluxo de água YF-S201. Três vezes ao dia, durante o horário suposto de funcionamento da bomba, a ESP32 liga e começa a escutar dados do sensor. Todos os códigos da ESP32 foram desenvolvidos em linguagem C++.
+O sistema embarcado constitui-se de uma ```ESP32``` conectada a um sensor de fluxo de água YF-S201. Três vezes ao dia, durante o horário suposto de funcionamento da bomba, a ESP32 liga e começa a escutar dados do sensor. Todos os códigos da ESP32 foram desenvolvidos em linguagem C++.
 
-O aplicativo foi desenvolvido no Android Studio, na linguagem Kotlin. O app constitui-se de apenas três telas simples, sendo elas:
+O aplicativo foi desenvolvido no ```Android Studio```, na linguagem ```Kotlin```. O app constitui-se de apenas três telas simples, sendo elas:
 - Uma home, para visualizar as irrigações do dia de hoje;
 - Um histórico, para visualizar as irrigações dos dias anteriores;
 - Uma página de configurações, para alterar os horários de irrigação.
 
-A integração do app com o sistema embarcado foi feito através do Firebase do Google. Ele é uma solução gratuita de servidor e de banco de dados em tempo real desenvolvido pelo Google.
+A integração do app com o sistema embarcado foi feito através do ```Firebase``` do Google. Ele é uma solução gratuita de servidor e de banco de dados em tempo real desenvolvido pelo Google.
+
+Portanto, pode-se dizer que o projeto consiste em três grandes partes: o sistema embarcado, o aplicativo e o servidor que interliga os dois.
+
+imagem ilustração do sistema
+
+# O Sistema Embarcado
 
 
-Escolhi utilizar ESP32 para solucionar o problema pela sua ampla utilização em projetos IoT, devido ao WiFi integrado. A sua programação foi feita através da Arduino IDE
+# O Aplicativo
 
-Para detectar o fluxo de água 
+
+# O Servidor
+
 
 
 
