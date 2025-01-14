@@ -1,4 +1,4 @@
-# gefen-greenhouse
+# IoT-Greenhouse
 
 Este repositório contém a minha implementação de um sistema de monitoramento de irrigação de uma estufa através de um aplicativo de celular, utilizando ESP32. 
 

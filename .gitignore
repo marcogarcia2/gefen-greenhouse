@@ -1,11 +1,9 @@
-# Arquivos gerados pelo Android Studio
+# Diretórios e arquivos gerados pelo Android Studio
 .idea/
 *.iml
 .gradle/
 build/
 captures/
-
-# Configurações locais
 local.properties
 
 # Arquivos gerados automaticamente
@@ -14,11 +12,18 @@ local.properties
 *.log
 
 # Diretório do wrapper do Gradle
-!gradle/wrapper/gradle-wrapper.properties
 .gradle/
 
-# Arquivos com informações sensíveis
+# Permitir gradle-wrapper.properties, mas ignorar outros arquivos gerados
+!gradle/wrapper/gradle-wrapper.properties
+
+# Arquivos temporários
+.DS_Store
+
+# Arquivos sensíveis
 *secret.h
 
-# Outros
-.DS_Store
+# Diretórios e arquivos específicos do ESP32
+*.bin
+*.elf
+*.map

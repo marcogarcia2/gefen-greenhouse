@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private val waitingColor = Color.parseColor("#ABABAB")
 
     // Função que traduz o número do mês em seu nome
-    private fun getMonth(number: Int): String {
+    private fun getMonthString(number: Int): String {
         return when (number) {
             1 -> "Janeiro"
             2 -> "Fevereiro"
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         // Exibindo a data de hoje
         val today = LocalDate.now()
         val day = today.dayOfMonth
-        val month = getMonth(today.monthValue)
+        val month = getMonthString(today.monthValue)
         binding.data.text = "${month}, ${day}"
 
         // Atribuindo o texto correto TESTEEEEEEEEEEEEEEEEEEEEEEE
