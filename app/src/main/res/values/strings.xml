@@ -6,5 +6,6 @@
     <string name="sucesso"><font color="#4BAE4F">Sucesso</font></string>
     <string name="falhou"><font color="#FF4141">Falhou</font></string>
     <string name="aguardando"><font color="ABABAB">Aguardando</font></string>
+    <string name="indeterminado"><font color="245DD9">Indeterminado</font></string>
 </resources>
 

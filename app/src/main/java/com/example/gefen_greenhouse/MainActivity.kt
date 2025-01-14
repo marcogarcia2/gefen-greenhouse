@@ -1,11 +1,16 @@
 package com.example.gefen_greenhouse
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
+import android.view.Gravity
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -18,10 +23,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var irrigationSystem: IrrigationSystem
 
-    // Mapeando cores para os textos
-    private val successColor = Color.parseColor("#4BAE4F")
-    private val failureColor = Color.parseColor("#FF4141")
-    private val waitingColor = Color.parseColor("#ABABAB")
 
     // Função que traduz o número do mês em seu nome
     private fun getMonthString(number: Int): String {
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             R.string.sucesso -> Color.parseColor("#4BAE4F") // Verde
             R.string.falhou -> Color.parseColor("#FF4141")  // Vermelho
             R.string.aguardando -> Color.parseColor("#ABABAB") // Cinza
+            R.string.indeterminado -> Color.parseColor("#245DD9")
             else -> Color.BLACK // Cor padrão
         }
     }
@@ -78,21 +80,71 @@ class MainActivity : AppCompatActivity() {
         // Inicializando a variável do sistema de irrigação
         irrigationSystem = ViewModelProvider(this).get(IrrigationSystem::class.java)
 
+        // Monitorando o sistema em tempo real
+        irrigationSystem.monitorTodayResults{updateUI()}
+    }
+
+    private fun updateUI() {
         // Exibindo a data de hoje
         val today = LocalDate.now()
         val day = today.dayOfMonth
         val month = getMonthString(today.monthValue)
         binding.data.text = "${month}, ${day}"
 
-        // Atribuindo o texto correto TESTEEEEEEEEEEEEEEEEEEEEEEE
-        irrigationSystem.updateStatus('S')
-        irrigationSystem.updateStatus('F')
+        val container = binding.dynamicContainer // LinearLayout no XML
+        container.removeAllViews() // Limpa as views antigas
 
-        // Atualizando os textos com cores
-        binding.resultado1.text = getColoredText(irrigationSystem.getStringID(0) ?: R.string.aguardando)
-        binding.resultado2.text = getColoredText(irrigationSystem.getStringID(1) ?: R.string.aguardando)
-        binding.resultado3.text = getColoredText(irrigationSystem.getStringID(2) ?: R.string.aguardando)
+        for ((time, status) in irrigationSystem.todayResults.toSortedMap()) {
 
+            // Cria o card
+            val card = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    250 // Altura do card
+                ).apply {
+                    setMargins(0, 16, 0, 16) // Margens entre os cards
+                }
+                orientation = LinearLayout.HORIZONTAL
+                setBackgroundResource(R.drawable.white_rectangle)
+                setPadding(24, 24, 24, 24)
+                gravity = Gravity.CENTER_VERTICAL // Centraliza verticalmente o conteúdo
+            }
 
+            // Cria o TextView para o horário
+            val timeTextView = TextView(this).apply {
+                text = time
+                setTextColor(Color.parseColor("#535353"))
+                alpha = 0.5f
+                textSize = 30f
+                layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f // Peso para alinhamento
+                ).apply {
+                    marginStart = 24 // Adiciona margem para afastar do canto esquerdo
+                }
+                gravity = Gravity.CENTER_VERTICAL // Garante que o texto do horário fique centralizado verticalmente
+            }
+
+            // Cria o TextView para o status
+            val statusTextView = TextView(this).apply {
+                text = getColoredText(irrigationSystem.statusDict[status] ?: R.string.indeterminado) // Aplica o texto formatado
+                textSize = 30f // Tamanho da fonte
+                setTypeface(null, Typeface.BOLD) // Fonte em negrito
+                layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    2f // Peso maior para ocupar mais espaço e centralizar no restante do espaço
+                )
+                gravity = Gravity.CENTER // Centraliza completamente no espaço restante
+            }
+
+            // Adiciona os TextViews ao card
+            card.addView(timeTextView)
+            card.addView(statusTextView)
+
+            // Adiciona o card ao contêiner
+            container.addView(card)
+        }
     }
 }
