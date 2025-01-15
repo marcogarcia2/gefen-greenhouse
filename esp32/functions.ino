@@ -17,12 +17,11 @@ char collectData(int final) {
     } 
     else {
       Serial.println("Erro ao atualizar o tempo!");
-      return 'f';
+      return 'I';
     }
-
   }
 
-  return 's';
+  return 'S';
 }
 
 // Função para colocar ESP32 em deep sleep por um tempo determinado
@@ -68,8 +67,8 @@ char* getDate() {
   return date; // Retorna o ponteiro para a string formatada
 }
 
-// Função que obtém o horário no formato "HH:MM"
-char* getTime(int timeInSeconds) {
+// Função que obtém o horário no formato "HH:MM" dado o número de segundos
+char* getTimeString(int timeInSeconds) {
   // Calcula horas e minutos
   int hours = timeInSeconds / 3600;
   int minutes = (timeInSeconds % 3600) / 60;
@@ -81,5 +80,23 @@ char* getTime(int timeInSeconds) {
   snprintf(newTime, 6, "%02d:%02d", hours, minutes);
 
   return newTime;
+}
+
+// Função que obtém o número de segundos dado um horário no formato "HH:MM"
+int getTimeInt(String timeInString) {
+    // Calcula o número de segundos dado essa string
+    int hours = 0;
+    int minutes = 0;
+
+    const char* timeInCharP = timeInString.c_str();
+
+    // Usa sscanf para extrair horas e minutos do formato "HH:MM"
+    if (sscanf(timeInCharP, "%d:%d", &hours, &minutes) == 2) {
+        // Converte horas e minutos para segundos
+        return (hours * 3600) + (minutes * 60);
+    }
+
+    // Retorna 0 caso o formato seja inválido
+    return 0;
 }
 

@@ -26,23 +26,58 @@ void connectWiFi() {
   }
 }
 
+
+// Função que descobre a ação a ser tomada
+int whatToDo(int currentTime){
+  
+  // Path para a leitura dos horários de funcionamento
+  const String path = "/Estufa/000h/";
+  String fullPath;
+  
+  // Índice para iterar sobre os dados
+  int index = 0;
+  
+  // Conecta-se com o banco de dados
+  Firebase.begin(firebase_host, firebase_auth);
+
+  // Loop while, vamos buscar o horário para atuar
+  while(true){
+
+    // Lê o dado e atualiza o path para a próxima, converte o tempo para int
+    fullPath = path + String(index++);
+    String discoveredTime = Firebase.getString(fullPath);
+    int newTime = getTimeInt(discoveredTime);
+
+    if (newTime){
+      if (newTime > currentTime){
+        Serial.printf("Horário descoberto: %s\n", discoveredTime);
+        return newTime;
+      }
+    }
+    else break;
+    
+  }
+
+  return 0;
+}
+
+
 // Função que trata os dados e os insere no BD
 bool insertData(int nextTime, char result){
 
   // O dado que desejamos inserir é do tipo ("2024-01-09", "08:00", 's')
   char* date = getDate();
-  char* time = getTime(nextTime);
+  char* time = getTimeString(nextTime);
 
   // Serial.printf("Dados a serem inseridos: (%s, %s, %c)\n", date, time, result);
   
-  char path[100] = "/Estufa/";
+  char path[25] = "/Estufa/";
   strcat(path, date);
   strcat(path, "/");
   strcat(path, time);
   char newResult[2] = {result, '\0'};
 
   // Inicializa a conexão com o banco de dados
-  Firebase.begin(firebase_host, firebase_auth);
   Firebase.setString(path, newResult);
 
   if(!Firebase.failed()){

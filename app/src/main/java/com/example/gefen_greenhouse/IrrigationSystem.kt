@@ -78,7 +78,7 @@ class IrrigationSystem : ViewModel() {
                         // É um horário que não tem nenhum valor associado mas existe no BD
                         val timeInSeconds = timeToSeconds(time)
                         if (timeInSeconds != null) {
-                            if (getCurrentTimeInSeconds() < timeInSeconds) {
+                            if (getCurrentTimeInSeconds() < timeInSeconds + (5 * 60)) {
                                 todayResults[time] = 'N'
                             } else {
                                 todayResults[time] = 'I'
