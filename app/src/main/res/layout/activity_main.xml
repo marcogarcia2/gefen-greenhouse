@@ -6,17 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BCEDB7"
-    android:clipChildren="false"
-    android:clipToPadding="false"
+    android:clipChildren="true"
+    android:clipToPadding="true"
     android:translationY="0dp"
     tools:context=".MainActivity">
 
     <!-- ScrollView para os elementos dinâmicos -->
+
     <ScrollView
         android:id="@+id/dynamicScrollView"
-        android:layout_width="379dp"
-        android:layout_height="443dp"
+        android:layout_width="389dp"
+        android:layout_height="467dp"
         android:layout_marginBottom="16dp"
+        android:clipChildren="true"
+        android:clipToPadding="true"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@+id/menu_inferior"
         app:layout_constraintEnd_toEndOf="parent"
