@@ -11,7 +11,23 @@
     android:translationY="0dp"
     tools:context=".MainActivity">
 
+
     <!-- ScrollView para os elementos dinâmicos -->
+
+
+    <ImageButton
+        android:id="@+id/refresh_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="60dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/refresh_button"
+        android:background="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.71"
+        app:layout_constraintStart_toEndOf="@+id/titulo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/refresh_button" />
 
     <ScrollView
         android:id="@+id/dynamicScrollView"
@@ -87,124 +103,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/descricao" />
 
-
-    <!--    <View-->
-    <!--        android:id="@+id/branco1"-->
-    <!--        android:layout_width="330dp"-->
-    <!--        android:layout_height="92dp"-->
-    <!--        android:layout_marginBottom="16dp"-->
-    <!--        android:background="@drawable/white_rectangle"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/branco2"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/hora_1"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:alpha="0.5"-->
-    <!--        android:fontFamily="@font/poppins"-->
-    <!--        android:text="08:00"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textColor="#535353"-->
-    <!--        android:textSize="30sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco1"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco1"-->
-    <!--        app:layout_constraintHorizontal_bias="0.076"-->
-    <!--        app:layout_constraintStart_toStartOf="@+id/branco1"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco1"-->
-    <!--        app:layout_constraintVertical_bias="0.441" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/resultado_1"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:fontFamily="@font/poppins_bold"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textSize="26sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco1"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco1"-->
-    <!--        app:layout_constraintHorizontal_bias="0.517"-->
-    <!--        app:layout_constraintStart_toEndOf="@+id/hora_1"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco1"-->
-    <!--        app:layout_constraintVertical_bias="0.489" />-->
-
-    <!--    <View-->
-    <!--        android:id="@+id/branco2"-->
-    <!--        android:layout_width="330dp"-->
-    <!--        android:layout_height="92dp"-->
-    <!--        android:layout_marginBottom="16dp"-->
-    <!--        android:background="@drawable/white_rectangle"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/branco3"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/hora_2"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:alpha="0.5"-->
-    <!--        android:fontFamily="@font/poppins"-->
-    <!--        android:text="14:00"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textColor="#535353"-->
-    <!--        android:textSize="30sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco2"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco2"-->
-    <!--        app:layout_constraintHorizontal_bias="0.111"-->
-    <!--        app:layout_constraintStart_toStartOf="@+id/branco2"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco2"-->
-    <!--        app:layout_constraintVertical_bias="0.534" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/resultado_2"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:fontFamily="@font/poppins_bold"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textSize="26sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco2"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco2"-->
-    <!--        app:layout_constraintStart_toEndOf="@+id/hora_2"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco2" />-->
-
-    <!--    <View-->
-    <!--        android:id="@+id/branco3"-->
-    <!--        android:layout_width="330dp"-->
-    <!--        android:layout_height="92dp"-->
-    <!--        android:layout_marginBottom="12dp"-->
-    <!--        android:background="@drawable/white_rectangle"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/menu_inferior"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/hora_3"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:alpha="0.5"-->
-    <!--        android:fontFamily="@font/poppins"-->
-    <!--        android:text="19:00"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textColor="#535353"-->
-    <!--        android:textSize="30sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco3"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco3"-->
-    <!--        app:layout_constraintHorizontal_bias="0.111"-->
-    <!--        app:layout_constraintStart_toStartOf="@+id/branco3"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco3"-->
-    <!--        app:layout_constraintVertical_bias="0.488" />-->
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/resultado_3"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:fontFamily="@font/poppins_bold"-->
-    <!--        android:textAlignment="center"-->
-    <!--        android:textSize="26sp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="@+id/branco3"-->
-    <!--        app:layout_constraintEnd_toEndOf="@+id/branco3"-->
-    <!--        app:layout_constraintStart_toEndOf="@+id/hora_3"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/branco3" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

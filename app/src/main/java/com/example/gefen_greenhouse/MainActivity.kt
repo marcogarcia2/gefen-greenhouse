@@ -82,6 +82,12 @@ class MainActivity : AppCompatActivity() {
 
         // Monitorando o sistema em tempo real
         irrigationSystem.monitorTodayResults{updateUI()}
+
+        // Configurando o botão de recarregar
+        binding.refreshButton.setOnClickListener {
+            Log.d("MainActivity", "Recarregando dados...")
+            irrigationSystem.monitorTodayResults { updateUI() } // Força a atualização do banco de dados
+        }
     }
 
     private fun updateUI() {
