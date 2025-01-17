@@ -96,6 +96,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
+
+        binding.controlButton.setOnClickListener {
+            Log.d("ActivityMain", "Mudando para a tela de controle")
+            val intent = Intent(this, ControlActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(0, 0)
+        }
     }
 
     private fun updateUI() {
