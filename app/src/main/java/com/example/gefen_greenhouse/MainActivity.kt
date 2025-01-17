@@ -1,5 +1,6 @@
 package com.example.gefen_greenhouse
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
@@ -87,6 +88,13 @@ class MainActivity : AppCompatActivity() {
         binding.refreshButton.setOnClickListener {
             Log.d("MainActivity", "Recarregando dados...")
             irrigationSystem.monitorTodayResults { updateUI() } // Força a atualização do banco de dados
+        }
+
+        binding.historyButton.setOnClickListener {
+            Log.d("ActivityMain", "Mudando para a tela de histórico")
+            val intent = Intent(this, HistoryActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(0, 0)
         }
     }
 

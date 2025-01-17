@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">gefen-greenhouse</string>
     <string name="titulo">Home</string>
+    <string name="historico">Histórico</string>
     <string name="descricao">Aplicativo de monitoramento da bomba de água da estufa do <b><b>GEFEN - CENA/USP</b></b></string>
     <string name="bold_descricao">GEFEN - CENA/USP</string>
     <string name="sucesso"><font color="#4BAE4F">Sucesso</font></string>

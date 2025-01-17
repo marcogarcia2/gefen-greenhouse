@@ -13,7 +13,7 @@ import java.util.Calendar
 class IrrigationSystem : ViewModel() {
 
     var todayResults: MutableMap<String, Char> = mutableMapOf()
-    val today: String = getCurrentDate()
+    var today: String = getCurrentDate()
     private var database: DatabaseReference
     val statusDict = mapOf(
         'N' to R.string.aguardando,
@@ -32,12 +32,13 @@ class IrrigationSystem : ViewModel() {
     // "14:00": 'N'
     fun monitorTodayResults(onUpdate: () -> Unit) {
         var pendingUpdates = 2 // Contador para rastrear as atualizações pendentes
+        todayResults.clear()
+        today = getCurrentDate()
 
         // Atualiza os resultados de hoje do nó correspondente
         database.child(today).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    todayResults.clear()
                     for (child in snapshot.children) {
                         val time = child.key
                         val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
