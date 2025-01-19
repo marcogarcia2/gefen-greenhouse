@@ -28,8 +28,7 @@ class IrrigationSystem : ViewModel() {
     }
 
     // Organiza os resultados da leitura de hoje, em um dicionário todayResults.
-    // "08:00": 'S'
-    // "14:00": 'N'
+    // --> Destinado a Home do app
     fun monitorTodayResults(onUpdate: () -> Unit) {
         var pendingUpdates = 2 // Contador para rastrear as atualizações pendentes
         todayResults.clear()
@@ -107,9 +106,8 @@ class IrrigationSystem : ViewModel() {
         }
     }
 
-
     // Retorna a data de hoje pelo sistema
-    private fun getCurrentDate(): String {
+    fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(Date())
     }
@@ -133,5 +131,43 @@ class IrrigationSystem : ViewModel() {
         val seconds = calendar.get(Calendar.SECOND)
         return hours * 3600 + minutes * 60 + seconds
     }
+
+    fun fetchHistory(onUpdate: (Map<String, Map<String, Char>>) -> Unit) {
+        val historyResults: MutableMap<String, MutableMap<String, Char>> = mutableMapOf()
+        val currentDate = getCurrentDate()
+
+        for (i in 0 until 10) {
+            val date = getPreviousDate(currentDate, i)
+            database.child(date).get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val dayResults: MutableMap<String, Char> = mutableMapOf()
+                    for (child in snapshot.children) {
+                        val time = child.key
+                        val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
+                        if (time != null) {
+                            dayResults[time] = status
+                        }
+                    }
+                    historyResults[date] = dayResults.toSortedMap().toMutableMap()
+                }
+
+                if (historyResults.size == 10 || i == 9) { // Atualiza ao final do loop
+                    onUpdate(historyResults.toSortedMap().toMutableMap())
+                }
+            }.addOnFailureListener {
+                Log.e("Firebase", "Erro ao carregar dados de $date")
+            }
+        }
+    }
+
+    // Retorna uma data `n` dias antes de uma data fornecida
+    private fun getPreviousDate(date: String, daysBefore: Int): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.time = dateFormat.parse(date)!!
+        calendar.add(Calendar.DAY_OF_YEAR, -daysBefore)
+        return dateFormat.format(calendar.time)
+    }
+
 
 }
