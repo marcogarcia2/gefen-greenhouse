@@ -21,10 +21,27 @@ class IrrigationSystem : ViewModel() {
         'F' to R.string.falhou,
         'I' to R.string.indeterminado
     )
+    private var password: String = ""
+    private val schedulePath: String = "000h"
+
+    // Excpetions:
+    class TimeAlreadyExistsException(message: String) : Exception(message)
 
     init {
         // Inicializando o Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("Estufa")
+
+        // Pegando a senha do banco de dados
+        database.child("000p").get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                password = snapshot.getValue(String::class.java) ?: ""
+                Log.d("SENHA", "Senha obtida: $password")
+            } else {
+                Log.d("SENHA", "Chave 000p não encontrada no banco de dados.")
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("SENHA", "Erro ao buscar a senha: ${exception.message}")
+        }
     }
 
     // Organiza os resultados da leitura de hoje, em um dicionário todayResults.
@@ -74,7 +91,7 @@ class IrrigationSystem : ViewModel() {
                     val time = child.getValue(String::class.java)
 
                     if (time != null && !todayResults.containsKey(time)) {
-                        Log.d("000h", "${child.getValue(String::class.java)}")
+//                        Log.d("000h", "${child.getValue(String::class.java)}")
                         // É um horário que não tem nenhum valor associado mas existe no BD
                         val timeInSeconds = timeToSeconds(time)
                         if (timeInSeconds != null) {
@@ -83,7 +100,7 @@ class IrrigationSystem : ViewModel() {
                             } else {
                                 todayResults[time] = 'I'
                             }
-                            Log.d("Firebase", "Valor manual adicionado: $time -> ${todayResults[time]}")
+//                            Log.d("Firebase", "Valor manual adicionado: $time -> ${todayResults[time]}")
                             todayResults = todayResults.toSortedMap().toMutableMap()
                         }
                     }
@@ -196,7 +213,7 @@ class IrrigationSystem : ViewModel() {
         return dates
     }
 
-
+    // Função que normaliza com todos os horários da database
     fun getStandardHours(onComplete: (List<String>) -> Unit) {
         val standardHours = mutableListOf<String>()
         database.child("000h").get().addOnSuccessListener { snapshot ->
@@ -215,6 +232,18 @@ class IrrigationSystem : ViewModel() {
             Log.e("Firebase", "Erro ao acessar o nó 000h: ${exception.message}")
             onComplete(emptyList())
         }
+    }
+
+
+    // Funções de Controle
+
+    // Função que valida a senha inserida pelo usuário
+    fun validatePassword(input: String): Boolean {
+        return input == password
+    }
+
+    fun addTimeToDatabase(input: String) {
+
     }
 
 
