@@ -21,6 +21,8 @@ class ControlActivity : AppCompatActivity() {
         binding = ActivityControlBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
