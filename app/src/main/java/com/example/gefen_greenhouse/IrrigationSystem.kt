@@ -132,42 +132,91 @@ class IrrigationSystem : ViewModel() {
         return hours * 3600 + minutes * 60 + seconds
     }
 
-    fun fetchHistory(onUpdate: (Map<String, Map<String, Char>>) -> Unit) {
-        val historyResults: MutableMap<String, MutableMap<String, Char>> = mutableMapOf()
-        val currentDate = getCurrentDate()
+    fun fetchHistory(onComplete: (Map<String, Map<String, Char>>) -> Unit) {
+        val historyResults = mutableMapOf<String, MutableMap<String, Char>>()
 
-        for (i in 0 until 10) {
-            val date = getPreviousDate(currentDate, i)
-            database.child(date).get().addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    val dayResults: MutableMap<String, Char> = mutableMapOf()
-                    for (child in snapshot.children) {
-                        val time = child.key
-                        val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
-                        if (time != null) {
-                            dayResults[time] = status
+        // Obter os horários padrão
+        getStandardHours { standardHours ->
+            // Obter os últimos 30 dias, incluindo hoje
+            val datesToFetch = getLastNDates(30)
+            var pendingDates = datesToFetch.size
+
+            for (date in datesToFetch) {
+                database.child(date).get().addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val resultsForDate = mutableMapOf<String, Char>()
+
+                        for (child in snapshot.children) {
+                            val time = child.key
+                            val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
+                            if (time != null) {
+                                resultsForDate[time] = status
+                            }
                         }
-                    }
-                    historyResults[date] = dayResults.toSortedMap().toMutableMap()
-                }
 
-                if (historyResults.size == 10 || i == 9) { // Atualiza ao final do loop
-                    onUpdate(historyResults.toSortedMap().toMutableMap())
+                        // Adiciona os resultados do dia no histórico
+                        historyResults[date] = resultsForDate
+
+                    } else if (date == getCurrentDate()) {
+                        // Dia de hoje está vazio. Adiciona horários padrão com status 'N'
+                        val resultsForToday = mutableMapOf<String, Char>()
+                        for (time in standardHours) {
+                            resultsForToday[time] = 'N'
+                        }
+                        historyResults[date] = resultsForToday
+                    }
+
+                    pendingDates--
+                    if (pendingDates == 0) {
+                        onComplete(historyResults.toSortedMap(compareByDescending { it }))
+                    }
+
+                }.addOnFailureListener { exception ->
+                    Log.e("Firebase", "Erro ao acessar o nó $date: ${exception.message}")
+                    pendingDates--
+                    if (pendingDates == 0) {
+                        onComplete(historyResults.toSortedMap(compareByDescending { it }))
+                    }
                 }
-            }.addOnFailureListener {
-                Log.e("Firebase", "Erro ao carregar dados de $date")
             }
         }
     }
 
     // Retorna uma data `n` dias antes de uma data fornecida
-    private fun getPreviousDate(date: String, daysBefore: Int): String {
+    private fun getLastNDates(n: Int): List<String> {
+        val dates = mutableListOf<String>()
+        val calendar = Calendar.getInstance() // Começa com a data de hoje
+
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val calendar = Calendar.getInstance()
-        calendar.time = dateFormat.parse(date)!!
-        calendar.add(Calendar.DAY_OF_YEAR, -daysBefore)
-        return dateFormat.format(calendar.time)
+        for (i in 0 until n) {
+            dates.add(dateFormat.format(calendar.time)) // Adiciona a data no formato correto
+            calendar.add(Calendar.DAY_OF_YEAR, -1) // Vai para o dia anterior
+        }
+
+        return dates
     }
+
+
+    fun getStandardHours(onComplete: (List<String>) -> Unit) {
+        val standardHours = mutableListOf<String>()
+        database.child("000h").get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                for (child in snapshot.children) {
+                    child.getValue(String::class.java)?.let { time ->
+                        standardHours.add(time)
+                    }
+                }
+                onComplete(standardHours.sorted()) // Retorna os horários ordenados
+            } else {
+                Log.d("Firebase", "Nenhum horário encontrado em /Estufa/000h/")
+                onComplete(emptyList())
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("Firebase", "Erro ao acessar o nó 000h: ${exception.message}")
+            onComplete(emptyList())
+        }
+    }
+
 
 
 }
