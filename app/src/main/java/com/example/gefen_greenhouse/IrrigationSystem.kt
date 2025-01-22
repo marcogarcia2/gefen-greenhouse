@@ -26,6 +26,10 @@ class IrrigationSystem : ViewModel() {
 
     // Excpetions:
     class TimeAlreadyExistsException(message: String) : Exception(message)
+    class DatabaseAccessError(message: String) : Exception(message)
+    class DatabaseInsertError(message: String) : Exception(message)
+    class TimeDoesNotExistException(message: String) : Exception(message)
+
 
     init {
         // Inicializando o Firebase Database
@@ -35,7 +39,7 @@ class IrrigationSystem : ViewModel() {
         database.child("000p").get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 password = snapshot.getValue(String::class.java) ?: ""
-                Log.d("SENHA", "Senha obtida: $password")
+                Log.d("SENHA", "Senha obtida com sucesso.")
             } else {
                 Log.d("SENHA", "Chave 000p não encontrada no banco de dados.")
             }
@@ -84,7 +88,7 @@ class IrrigationSystem : ViewModel() {
         })
 
         // Adiciona horários manuais do nó "000h"
-        database.child("000h").get().addOnSuccessListener { snapshot ->
+        database.child(schedulePath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 for (child in snapshot.children) {
                     // Essas são as horas de funcionamento definidas no BD
@@ -216,7 +220,7 @@ class IrrigationSystem : ViewModel() {
     // Função que normaliza com todos os horários da database
     fun getStandardHours(onComplete: (List<String>) -> Unit) {
         val standardHours = mutableListOf<String>()
-        database.child("000h").get().addOnSuccessListener { snapshot ->
+        database.child(schedulePath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 for (child in snapshot.children) {
                     child.getValue(String::class.java)?.let { time ->
@@ -234,7 +238,6 @@ class IrrigationSystem : ViewModel() {
         }
     }
 
-
     // Funções de Controle
 
     // Função que valida a senha inserida pelo usuário
@@ -242,10 +245,89 @@ class IrrigationSystem : ViewModel() {
         return input == password
     }
 
-    fun addTimeToDatabase(input: String) {
+    fun addTimeToDatabase(input: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
 
+        val standardHours = mutableListOf<String>()
+        database.child(schedulePath).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                for (child in snapshot.children) {
+                    child.getValue(String::class.java)?.let { time ->
+                        standardHours.add(time)
+                    }
+                }
+
+                // Verifica se o horário já existe
+                if (input in standardHours) {
+                    onFailure(TimeAlreadyExistsException("Esse horário já está cadastrado no banco de dados."))
+                    return@addOnSuccessListener
+                }
+
+                // Adiciona, ordena e atualiza no banco
+                standardHours.add(input)
+                standardHours.sort()
+
+                val newSchedule = mutableMapOf<String, String>()
+                standardHours.forEachIndexed { index, time ->
+                    newSchedule[index.toString()] = time
+                }
+
+                database.child(schedulePath).setValue(newSchedule).addOnSuccessListener {
+                    onSuccess()
+                }.addOnFailureListener { exception ->
+                    onFailure(DatabaseInsertError("Erro ao inserir dados no nó 000h: ${exception.message}"))
+                }
+            } else {
+                // Se não há dados existentes, insere diretamente
+                val newEntry = mapOf("0" to input)
+                database.child(schedulePath).setValue(newEntry).addOnSuccessListener {
+                    onSuccess()
+                }.addOnFailureListener { exception ->
+                    onFailure(DatabaseInsertError("Erro ao inserir o horário: ${exception.message}"))
+                }
+            }
+        }.addOnFailureListener { exception ->
+            onFailure(DatabaseAccessError("Erro ao acessar o nó 000h: ${exception.message}"))
+        }
     }
 
+    fun removeTimeFromDatabase(input: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val standardHours = mutableListOf<String>()
+        database.child(schedulePath).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                for (child in snapshot.children) {
+                    child.getValue(String::class.java)?.let { time ->
+                        standardHours.add(time)
+                    }
+                }
 
+                // Verifica se o horário não existe no BD
+                if (input !in standardHours) {
+                    onFailure(TimeDoesNotExistException("Esse horário não existe no banco de dados."))
+                    return@addOnSuccessListener
+                }
 
+                // remove, ordena e atualiza no banco
+                standardHours.remove(input)
+                standardHours.sort()
+
+                val newSchedule = mutableMapOf<String, String>()
+                standardHours.forEachIndexed { index, time ->
+                    newSchedule[index.toString()] = time
+                }
+
+                database.child(schedulePath).setValue(newSchedule).addOnSuccessListener {
+                    onSuccess()
+                }.addOnFailureListener { exception ->
+                    onFailure(DatabaseInsertError("Erro ao inserir dados no nó 000h: ${exception.message}"))
+                }
+
+            } else {
+                onFailure(TimeDoesNotExistException("Esse horário não existe no banco de dados."))
+                return@addOnSuccessListener
+            }
+
+        }.addOnFailureListener { exception ->
+            onFailure(DatabaseAccessError("Erro ao acessar o nó 000h: ${exception.message}"))
+        }
+    }
 }
