@@ -167,15 +167,14 @@ class IrrigationSystem : ViewModel() {
 
         // Obter os horários padrão
         getStandardHours { standardHours ->
-            // Obter os últimos 30 dias, incluindo hoje
-            val datesToFetch = getLastNDates(30)
+            val datesToFetch = getLastNDates(30) // Obter os últimos 30 dias, incluindo hoje
             var pendingDates = datesToFetch.size
 
             for (date in datesToFetch) {
                 database.child(date).get().addOnSuccessListener { snapshot ->
+                    val resultsForDate = mutableMapOf<String, Char>()
+                    // Adiciona todos os horários que possuem dados no banco
                     if (snapshot.exists()) {
-                        val resultsForDate = mutableMapOf<String, Char>()
-
                         for (child in snapshot.children) {
                             val time = child.key
                             val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
@@ -183,21 +182,21 @@ class IrrigationSystem : ViewModel() {
                                 resultsForDate[time] = status
                             }
                         }
-
-                        // Adiciona os resultados do dia no histórico
-                        historyResults[date] = resultsForDate
-
-                    } else if (date == getCurrentDate()) {
-                        // Dia de hoje está vazio. Adiciona horários padrão com status 'N'
-                        val resultsForToday = mutableMapOf<String, Char>()
-                        for (time in standardHours) {
-                            resultsForToday[time] = 'N'
-                        }
-                        historyResults[date] = resultsForToday
                     }
+
+                    // Adiciona os horários padrão como 'N' apenas se não estiverem nos dados do banco
+                    for (time in standardHours) {
+                        if (!resultsForDate.containsKey(time)) {
+                            resultsForDate[time] = 'N'
+                        }
+                    }
+
+                    // Adiciona os resultados para a data no histórico
+                    historyResults[date] = resultsForDate
 
                     pendingDates--
                     if (pendingDates == 0) {
+                        // Retorna o histórico ordenado por data (mais recentes primeiro)
                         onComplete(historyResults.toSortedMap(compareByDescending { it }))
                     }
 
@@ -205,6 +204,7 @@ class IrrigationSystem : ViewModel() {
                     Log.e("Firebase", "Erro ao acessar o nó $date: ${exception.message}")
                     pendingDates--
                     if (pendingDates == 0) {
+                        // Retorna o histórico, mesmo com falhas
                         onComplete(historyResults.toSortedMap(compareByDescending { it }))
                     }
                 }
@@ -254,6 +254,7 @@ class IrrigationSystem : ViewModel() {
         return input == password
     }
 
+    // Função que adiciona um horário a database
     fun addTimeToDatabase(input: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
 
         val standardHours = mutableListOf<String>()
@@ -299,6 +300,7 @@ class IrrigationSystem : ViewModel() {
         }
     }
 
+    // Função que remove um horário da database
     fun removeTimeFromDatabase(input: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val standardHours = mutableListOf<String>()
         database.child(schedulePath).get().addOnSuccessListener { snapshot ->

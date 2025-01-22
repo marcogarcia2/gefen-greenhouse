@@ -61,7 +61,29 @@ class HistoryActivity : AppCompatActivity() {
             // Ordenar as datas em ordem decrescente
             val sortedHistoryResults = historyResults.toSortedMap(compareByDescending { it })
 
-            for ((date, results) in sortedHistoryResults) { // Iterar do mais recente para o mais antigo
+            for ((date, results) in sortedHistoryResults) {
+                val completeResults = mutableMapOf<String, Char>()
+
+                // Adicione os horários com dados
+                results.forEach { (time, status) ->
+                    completeResults[time] = status
+                }
+
+                // Adicione horários padrão que estão faltando
+                standardHours.forEach { hour ->
+                    if (!completeResults.containsKey(hour)) {
+                        completeResults[hour] = 'N'
+                    }
+                }
+
+                // Verifique se todos os horários têm status padrão 'N'
+                val hasOnlyDefaultValues = completeResults.values.all { it == 'N' }
+                if (hasOnlyDefaultValues) {
+                    // Ignorar esse dia, pois ele não tem dados relevantes
+                    continue
+                }
+
+                // Criar o cartão para o dia
                 val card = LinearLayout(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -92,13 +114,10 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 card.addView(dateTextView)
 
-                // Combine os resultados do histórico com os horários padrão
-                val completeResults = mutableMapOf<String, Char>()
-                standardHours.forEach { hour ->
-                    completeResults[hour] = results[hour] ?: 'N' // Adiciona 'N' se o horário estiver ausente
-                }
+                // Ordenar os horários antes de exibir
+                val sortedCompleteResults = completeResults.toSortedMap()
 
-                for ((time, status) in completeResults) {
+                for ((time, status) in sortedCompleteResults) {
                     val row = LinearLayout(this).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -148,5 +167,6 @@ class HistoryActivity : AppCompatActivity() {
             }
         }
     }
+
 
 }
