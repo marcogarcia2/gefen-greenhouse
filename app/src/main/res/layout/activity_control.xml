@@ -163,5 +163,38 @@
         app:layout_constraintStart_toEndOf="@+id/addButton"
         app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword" />
 
+    <TextView
+        android:id="@+id/controle_subtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="64dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="@string/controle_subtitulo"
+        android:textColor="#194215"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addButton" />
+
+    <ScrollView
+        android:id="@+id/scrollViewHorarios"
+        android:layout_width="160dp"
+        android:layout_height="245dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/menu_inferior"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/controle_subtitulo"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutHorarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

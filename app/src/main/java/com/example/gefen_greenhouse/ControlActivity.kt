@@ -3,14 +3,14 @@ package com.example.gefen_greenhouse
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityControlBinding
-import com.example.gefen_greenhouse.databinding.ActivityHistoryBinding
 
 class ControlActivity : AppCompatActivity() {
 
@@ -62,8 +62,20 @@ class ControlActivity : AppCompatActivity() {
                     onSuccess = {
                         Log.d("Controle", "Horário adicionado com sucesso.")
                         showToast("Horário adicionado com sucesso!")
+
+                        // Limpa o texto
                         binding.editTextText.text.clear()
                         binding.editTextTextPassword.text.clear()
+
+                        // Mostra os horários atuais atualizados
+                        irrigationSystem.getWorkingTimes { workingTimes ->
+                            if (workingTimes.isNotEmpty()) {
+                                displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
+                            } else {
+                                Log.d("ControlActivity", "Nenhum horário encontrado.")
+                            }
+                        }
+
                     },
                     onFailure = { exception ->
                         Log.d("Controle", "Erro: ${exception.message}")
@@ -91,8 +103,19 @@ class ControlActivity : AppCompatActivity() {
                     onSuccess = {
                         Log.d("Controle", "Horário removido com sucesso.")
                         showToast("Horário removido com sucesso!")
+
+                        // Limpa o texto
                         binding.editTextText.text.clear()
                         binding.editTextTextPassword.text.clear()
+
+                        // Mostra os horários atuais atualizados
+                        irrigationSystem.getWorkingTimes { workingTimes ->
+                            if (workingTimes.isNotEmpty()) {
+                                displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
+                            } else {
+                                Log.d("ControlActivity", "Nenhum horário encontrado.")
+                            }
+                        }
                     },
                     onFailure = { exception ->
                         Log.d("Controle", "Erro: ${exception.message}")
@@ -108,7 +131,14 @@ class ControlActivity : AppCompatActivity() {
             }
         }
 
-        // 
+        // Mostra os horários atuais
+        irrigationSystem.getWorkingTimes { workingTimes ->
+            if (workingTimes.isNotEmpty()) {
+                displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
+            } else {
+                Log.d("ControlActivity", "Nenhum horário encontrado.")
+            }
+        }
     }
 
     // Função que realiza todas as verificações de formato para então tentar adicionar
@@ -200,5 +230,28 @@ class ControlActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
+    // Função que atualiza os horários atuais e mostra na tela
+    private fun displayCurrentSchedule(schedule: List<String>) {
+        val linearHorarios = binding.linearLayoutHorarios
+        linearHorarios.removeAllViews()
+
+        for (time in schedule) {
+            val timeTextView = TextView(this).apply {
+                text = time
+                textSize = 18f
+                setTextColor(Color.BLACK)
+                typeface = resources.getFont(R.font.poppins)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 16, 0, 16)
+                }
+                gravity = Gravity.CENTER
+            }
+
+            linearHorarios.addView(timeTextView)
+        }
+    }
 
 }

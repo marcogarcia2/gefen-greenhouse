@@ -10,5 +10,7 @@
     <string name="falhou"><font color="#FF4141">Falhou</font></string>
     <string name="aguardando"><font color="ABABAB">Aguardando</font></string>
     <string name="indeterminado"><font color="245DD9">Indeterminado</font></string>
+    <string name="controle_subtitulo">Horários Atuais</string>
+
 </resources>
 

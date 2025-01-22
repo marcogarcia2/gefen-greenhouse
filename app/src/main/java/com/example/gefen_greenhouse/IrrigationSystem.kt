@@ -14,13 +14,15 @@ class IrrigationSystem : ViewModel() {
 
     var todayResults: MutableMap<String, Char> = mutableMapOf()
     var today: String = getCurrentDate()
-    private var database: DatabaseReference
     val statusDict = mapOf(
         'N' to R.string.aguardando,
         'S' to R.string.sucesso,
         'F' to R.string.falhou,
         'I' to R.string.indeterminado
     )
+
+    private var workingTimes: MutableList<String> = mutableListOf()
+    private var database: DatabaseReference
     private var password: String = ""
     private val schedulePath: String = "000h"
 
@@ -48,8 +50,10 @@ class IrrigationSystem : ViewModel() {
         }
     }
 
+
+    // Funções de Home
+
     // Organiza os resultados da leitura de hoje, em um dicionário todayResults.
-    // --> Destinado a Home do app
     fun monitorTodayResults(onUpdate: () -> Unit) {
         var pendingUpdates = 2 // Contador para rastrear as atualizações pendentes
         todayResults.clear()
@@ -133,6 +137,7 @@ class IrrigationSystem : ViewModel() {
         return dateFormat.format(Date())
     }
 
+    // Converte uma string em segundos
     private fun timeToSeconds(time: String): Int? {
         val parts = time.split(":")
         if (parts.size == 2) {
@@ -145,6 +150,7 @@ class IrrigationSystem : ViewModel() {
         return null // Retorna null se o formato não for válido
     }
 
+    // Converte o tempo atual em segundos
     fun getCurrentTimeInSeconds(): Int {
         val calendar = Calendar.getInstance()
         val hours = calendar.get(Calendar.HOUR_OF_DAY)
@@ -153,6 +159,9 @@ class IrrigationSystem : ViewModel() {
         return hours * 3600 + minutes * 60 + seconds
     }
 
+    // Funções de Histórico
+
+    // Função que organiza e mostra o histórico
     fun fetchHistory(onComplete: (Map<String, Map<String, Char>>) -> Unit) {
         val historyResults = mutableMapOf<String, MutableMap<String, Char>>()
 
@@ -328,6 +337,27 @@ class IrrigationSystem : ViewModel() {
 
         }.addOnFailureListener { exception ->
             onFailure(DatabaseAccessError("Erro ao acessar o nó 000h: ${exception.message}"))
+        }
+    }
+
+    // Função que retorna uma lista de strings com os horários atuais
+    fun getWorkingTimes(onComplete: (List<String>) -> Unit) {
+        database.child(schedulePath).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                workingTimes.clear() // Limpa a lista antes de atualizar
+                for (child in snapshot.children) {
+                    child.getValue(String::class.java)?.let { time ->
+                        workingTimes.add(time)
+                    }
+                }
+                workingTimes.sort() // Ordena os horários
+                onComplete(workingTimes) // Retorna a lista atualizada no callback
+            } else {
+                onComplete(emptyList()) // Retorna lista vazia se não houver dados
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("IrrigationSystem", "Erro ao acessar o banco de dados: ${exception.message}")
+            onComplete(emptyList()) // Retorna lista vazia em caso de erro
         }
     }
 }
