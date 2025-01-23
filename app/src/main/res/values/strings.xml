@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">gefen-greenhouse</string>
+    <string name="app_name">Estufa GEFEN</string>
     <string name="titulo">Home</string>
     <string name="historico">Histórico</string>
     <string name="controle">Controle</string>
