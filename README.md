@@ -13,6 +13,16 @@ O CENA possui uma estufa, fundada em 1962 e que foi tombada como patrimônio his
 
 imagem da estufa e logo do gefen
 
+<p align="center">
+  <img src="images/Logo_GEFEN.png" alt="GEFEN" width="500">
+</p>
+<p align="center">
+  <a href="https://www.linkedin.com/in/gefen-usp/" style="font-size: 12px; text-decoration: none; color: inherit;">
+    <u>GEFEN - CENA/USP</u>
+  </a>
+</p>
+
+
 
 ## Ilustrando o problema
 A fim de automatizar o processo de irrigação, o GEFEN comprou uma bomba de água e desenvolveu um sistema de irrigação automático com um timer. Este timer foi configurado para ligar a bomba três vezes ao dia, impulsionando a água através de um tubo gotejador, assim regando as plantas automaticamente. 

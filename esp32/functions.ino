@@ -4,12 +4,30 @@
 char collectData(int final) {
 
   int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+  int sum = 0;
+  float dxdt = 0;
+  int time_interval = 500;
+  int value, prev_value = 0;
+  int threshold = 500;
 
+  // Loop principal, que realiza a leitura do sensor
   while (currentTime < final) {
 
-    int value = analogRead(pin);
+    value = analogRead(pin);
+    sum += value;
+
+    // Calcula-se a "derivada" dos valores lidos
+    dxdt = (float)(value - prev_value) / (float)time_interval;
+    prev_value = value;
+
+    // A partir do momento que começou a ler um valor alto, caso volte a zero, deve encerrar
+    if (value > threshold && check < 15){
+      check++;
+    }
+
+
     Serial.printf("Valor lido pelo sensor: %d\n", value);
-    delay(500);
+    delay(time_interval);
 
     // Atualiza o tempo atual
     if (getLocalTime(&timeinfo)) {
@@ -19,6 +37,7 @@ char collectData(int final) {
       Serial.println("Erro ao atualizar o tempo!");
       return 'I';
     }
+    
   }
 
   return 'S';
