@@ -5,29 +5,57 @@ Este repositório contém a minha implementação de um sistema de monitoramento
 Este projeto foi um pedido de um amigo, a fim de automatizar o processo de rega de plantar para facilitar os experimentos.
 
 ## GEFEN - CENA/USP
-Meu amigo Gustavo é estudante de Engenharia Agronômica pela ESALQ (Escola Superior de Agricultura Luiz de Queiroz), em Piracicaba, São Paulo. Além de ser estudante de graduação, ele é membro e pesquisador do GEFEN (Grupo de Estudos em Fertilizantes Especiais e Nutrição) do CENA (Centro de Energia Nuclear na Agricultura). Ambos os Institutos pertencem à USP, a gloriosa Universidade de São Paulo. 
-
-imagem da logo do CENA e da Esalq.
-
-O CENA possui uma estufa, fundada em 1962 e que foi tombada como patrimônio histórico da USP. Essa estufa é utilizada pelo GEFEN, para a realização de diversos experimentos em diferentes plantas.
-
-imagem da estufa e logo do gefen
+Meu amigo Gustavo é estudante de Engenharia Agronômica pela ESALQ (Escola Superior de Agricultura Luiz de Queiroz), em Piracicaba, São Paulo. 
 
 <p align="center">
-  <img src="images/Logo_GEFEN.png" alt="GEFEN" width="500">
+  <img src="images/esalq.jpg" alt="ESALQ" width="550">
 </p>
 <p align="center">
-  <a href="https://www.linkedin.com/in/gefen-usp/" style="font-size: 12px; text-decoration: none; color: inherit;">
-    <u>GEFEN - CENA/USP</u>
+  <a style="font-size: 12px; text-decoration: none; color: inherit;">
+    Prédio principal da ESALQ.
   </a>
 </p>
 
+Além de ser estudante de graduação, ele é membro e pesquisador do GEFEN (Grupo de Estudos em Fertilizantes Especiais e Nutrição) do CENA (Centro de Energia Nuclear na Agricultura). Ambos os Institutos pertencem à ```USP```, a gloriosa Universidade de São Paulo. 
 
+O CENA possui uma estufa, fundada em 1962 e que foi tombada como patrimônio histórico da USP. Essa estufa é utilizada pelo GEFEN, para a realização de diversos experimentos em diferentes plantas.
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="images/logo_cena.png" alt="CENA - USP" height="250"><br>
+      <a href="https://www.linkedin.com/company/centro-de-energia-nuclear-na-agricultura---cena-usp/" style="font-size: 12px; text-decoration: none; color: inherit;">
+        <u>CENA - USP</u>
+      </a>
+    </td>
+    <td align="center">
+      <img src="images/Logo_GEFEN.png" alt="GEFEN" height="200"><br>
+      <a href="https://www.linkedin.com/in/gefen-usp/" style="font-size: 12px; text-decoration: none; color: inherit;">
+        <u>GEFEN</u>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## Ilustrando o problema
-A fim de automatizar o processo de irrigação, o GEFEN comprou uma bomba de água e desenvolveu um sistema de irrigação automático com um timer. Este timer foi configurado para ligar a bomba três vezes ao dia, impulsionando a água através de um tubo gotejador, assim regando as plantas automaticamente. 
+A fim de automatizar o processo de irrigação, o GEFEN comprou uma bomba de água e desenvolveu um sistema de irrigação automático com um timer. Este timer foi configurado para ligar a bomba algumas vezes ao dia, impulsionando a água através de um tubo gotejador, assim regando as plantas automaticamente.
 
-imagem da bomba e do tubo gotejador
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="images/pump.jpeg" alt="Bomba" height="250"><br>
+      <a style="font-size: 12px; text-decoration: none; color: inherit;">
+        Bomba de água.
+      </a>
+    </td>
+    <td align="center">
+      <img src="images/tubo.png" alt="Tubo" height="250"><br>
+      <a style="font-size: 12px; text-decoration: none; color: inherit;">
+        Tubo gotejador.
+      </a>
+    </td>
+  </tr>
+</table>
 
 Foi aí que meu amigo Gus entrou em contato comigo. Ele relatou que por vezes esse sistema falha, ou porque o timer falhou inesperadamente ou porque entrou ar no sistema da bomba e nenhuma água foi bombeada, assim compromentendo o experimento e podendo levar a morte das plantas. 
 
