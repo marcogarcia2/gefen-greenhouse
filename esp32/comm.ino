@@ -94,12 +94,8 @@ bool insertData(int nextTime, char result, float volume){
     strcpy(aux_path, path);
     strcat(aux_path, "/volume");
 
-    // Converte o volume para String
-    char newVolume[10];
-    sprintf(newVolume, "%.1f", volume);
-
     // Inserindo o dado de volume
-    Firebase.setString(aux_path, newVolume);
+    Firebase.setFloat(aux_path, volume);
   }
 
   if(!Firebase.failed()){
