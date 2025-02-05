@@ -182,6 +182,7 @@ class IrrigationSystem : ViewModel() {
             for (date in datesToFetch) {
                 database.child(date).get().addOnSuccessListener { snapshot ->
                     val resultsForDate = mutableMapOf<String, Map<String, Any>>()
+                    var totalVolume = 0.0
 
                     // Aqui vamos iterar sobre cada horário de uma data
                     if (snapshot.exists()) {
@@ -195,6 +196,7 @@ class IrrigationSystem : ViewModel() {
                                     "status" to status,
                                     "volume" to volume
                                 )
+                                totalVolume += volume
                             }
                         }
                     }
@@ -212,7 +214,9 @@ class IrrigationSystem : ViewModel() {
                     }
 
                     // Adiciona os resultados para a data no histórico
+                    resultsForDate["total"] = mapOf("volume" to totalVolume)
                     historyResults[date] = resultsForDate
+
 
                     pendingDates--
                     if (pendingDates == 0) {

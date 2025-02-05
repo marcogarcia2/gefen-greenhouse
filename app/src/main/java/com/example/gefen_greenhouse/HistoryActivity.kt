@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityHistoryBinding
 import java.util.Locale
@@ -57,13 +58,20 @@ class HistoryActivity : AppCompatActivity() {
             val sortedHistoryResults = historyResults.toSortedMap(compareByDescending { it })
 
             for ((date, results) in sortedHistoryResults) {
+
                 val completeResults = mutableMapOf<String, Map<String, Any>>()
 
                 // Adiciona os horários com dados
                 completeResults.putAll(results)
 
-                // Ignora dias que só possuem status 'N'
-                if (completeResults.values.all { it["status"] == 'N' }) continue
+                // Ignora dias em que todos os status são 'N' ou 'I'
+                if (completeResults.values.all { timeData ->
+                        val status = timeData["status"] as? Char ?: 'I' // Assume 'I' se o status não existir
+                        status == 'N' || status == 'I'
+                    }) {
+                    Log.d("HistoryDebug", "Dia ignorado (todos os status são 'N' ou 'I'): $date")
+                    continue
+                }
 
                 // Criar card do dia
                 val card = LinearLayout(this).apply {
@@ -79,6 +87,7 @@ class HistoryActivity : AppCompatActivity() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
+                // Converte a data para o padrão brasileiro
                 val formattedDate = try {
                     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -99,6 +108,10 @@ class HistoryActivity : AppCompatActivity() {
                 val sortedCompleteResults = completeResults.toSortedMap()
 
                 for ((time, data) in sortedCompleteResults) {
+
+                    // Ignora a entrada de total da base
+                    if (time in listOf("total")) continue
+
                     val status = data["status"] as? Char ?: 'I'
                     val volume = data["volume"] as? Double ?: 0.0
 
@@ -163,6 +176,37 @@ class HistoryActivity : AppCompatActivity() {
                     card.addView(row)
                 }
 
+                // Obtém o volume total do dia
+                val totalVolume = (results["total"]?.get("volume") as? Double) ?: 0.0
+
+                if (totalVolume > 0.0){
+
+                    // Criar uma View para o rodapé verde
+                    val totalFooter = LinearLayout(this).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        background = ContextCompat.getDrawable(this@HistoryActivity, R.drawable.rounded_green_background) // Aplica o drawable com bordas arredondadas
+                        setPadding(24, 16, 24, 16)
+                    }
+
+                    // Texto do total de volume
+                    val totalTextView = TextView(this).apply {
+                        text = "Total: ${"%.1f".format(totalVolume)} mL"
+                        textSize = 18f
+                        setTypeface(null, Typeface.BOLD)
+                        setTextColor(Color.WHITE)
+                    }
+
+                    // Adiciona o texto ao rodapé verde
+                    totalFooter.addView(totalTextView)
+
+                    // Adiciona o rodapé verde DENTRO do card branco (último item)
+                    card.addView(totalFooter)
+                }
+
+                // Adiciona o card ao container principal
                 container.addView(card)
             }
         }
