@@ -63,7 +63,7 @@ int whatToDo(int currentTime){
 
 
 // Função que trata os dados e os insere no BD
-bool insertData(int nextTime, char result){
+bool insertData(int nextTime, char result, float volume){
 
   // O dado que desejamos inserir é do tipo ("2024-01-09", "08:00", 's')
   char* date = getDate();
@@ -75,10 +75,32 @@ bool insertData(int nextTime, char result){
   strcat(path, date);
   strcat(path, "/");
   strcat(path, time);
+
+  //  O path vai ficar fixo, preciso inserir no status e caso S, volume
+  char aux_path[31];
+  strcpy(aux_path, path);
+  strcat(aux_path, "/status");
+
+  // Transforma o result em String
   char newResult[2] = {result, '\0'};
 
-  // Inicializa a conexão com o banco de dados
-  Firebase.setString(path, newResult);
+  // Inserindo o dado de status
+  Firebase.setString(aux_path, newResult);
+
+  // Caso seja sucesso, vamos guardar a informação de volume também
+  if (result == 'S'){
+    
+    // Criando o path correto
+    strcpy(aux_path, path);
+    strcat(aux_path, "/volume");
+
+    // Converte o volume para String
+    char newVolume[10];
+    sprintf(newVolume, "%.1f", volume);
+
+    // Inserindo o dado de volume
+    Firebase.setString(aux_path, newVolume);
+  }
 
   if(!Firebase.failed()){
     Serial.println("Dados inseridos com sucesso.");

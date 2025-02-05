@@ -82,8 +82,11 @@
 
     <TextView
         android:id="@+id/descricao"
-        android:layout_width="241dp"
-        android:layout_height="67dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:breakStrategy="simple"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins"
         android:text="@string/descricao"
@@ -97,11 +100,12 @@
         android:id="@+id/data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_bold"
         android:textColor="#194215"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/descricao" />
 
@@ -120,12 +124,12 @@
             android:id="@+id/controlButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:padding="6dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:background="@drawable/ripple_rounded"
             android:clickable="true"
             android:focusable="true"
+            android:padding="6dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/gear" />
 
@@ -134,12 +138,12 @@
             android:id="@+id/homeButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:padding="6dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:background="@drawable/ripple_rounded"
             android:clickable="true"
             android:focusable="true"
+            android:padding="6dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/home" />
 
@@ -148,12 +152,12 @@
             android:id="@+id/historyButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:padding="6dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:background="@drawable/ripple_rounded"
             android:clickable="true"
             android:focusable="true"
+            android:padding="6dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/history" />
 

@@ -3,8 +3,8 @@
     <string name="titulo">Home</string>
     <string name="historico">Histórico</string>
     <string name="controle">Controle</string>
-    <string name="descricao">Aplicativo de monitoramento da bomba de água da estufa do <b><b>GEFEN - CENA/USP</b></b></string>
-    <string name="descricao_controle">Digite o horário que deseja <b>ADICIONAR</b> ou <b>REMOVER</b>:</string>
+    <string name="descricao">Aplicativo de monitoramento da\nbomba de água da estufa do\n<b>GEFEN - CENA/USP</b></string>
+    <string name="descricao_controle">Digite o horário que deseja\n<b>ADICIONAR</b> ou <b>REMOVER</b>:</string>
     <string name="bold_descricao">GEFEN - CENA/USP</string>
     <string name="sucesso"><font color="#4BAE4F">Sucesso</font></string>
     <string name="falhou"><font color="#FF4141">Falhou</font></string>

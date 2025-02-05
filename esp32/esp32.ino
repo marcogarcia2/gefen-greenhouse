@@ -57,7 +57,8 @@ void setup() {
 
   // 3. Está na hora certa, vamos coletar os dados
   Serial.println("Chegou a hora! Vou coletar os dados do sensor.");
-  char result = collectData(nextTime + offset);
+  float volume = 0.0;
+  char result = collectData(nextTime + offset, &volume);
 
   // Agora precisamos enviar o dado coletado ao BD
   if (result == 'S'){
@@ -70,7 +71,7 @@ void setup() {
     Serial.println("Falha no sensor! Enviando dados ao servidor...");
   }
 
-  insertData(nextTime, result);
+  insertData(nextTime, result, volume);
   Serial.println("Acabou, vou voltar a dormir.");
 
   // Por fim, precisamos dormir até a próxima hora ou até a meia-noite.

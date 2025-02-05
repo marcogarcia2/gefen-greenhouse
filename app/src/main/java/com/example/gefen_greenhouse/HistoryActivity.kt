@@ -21,16 +21,13 @@ class HistoryActivity : AppCompatActivity() {
     private lateinit var irrigationSystem: IrrigationSystem
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        // Criando o Binding
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Iniciando a variável do sistema de irrigação
         irrigationSystem = ViewModelProvider(this).get(IrrigationSystem::class.java)
 
-        // Buscar o histórico dos últimos 7 dias
+        // Buscar o histórico atualizado
         irrigationSystem.fetchHistory { historyResults ->
             runOnUiThread {
                 displayHistory(historyResults)
@@ -52,58 +49,43 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayHistory(historyResults: Map<String, Map<String, Char>>) {
+    private fun displayHistory(historyResults: Map<String, Map<String, Map<String, Any>>>) {
         val container = binding.historyContainer
         container.removeAllViews()
 
-        // Obtenha os horários padrão de /Estufa/000h/
         irrigationSystem.getStandardHours { standardHours ->
-            // Ordenar as datas em ordem decrescente
             val sortedHistoryResults = historyResults.toSortedMap(compareByDescending { it })
 
             for ((date, results) in sortedHistoryResults) {
-                val completeResults = mutableMapOf<String, Char>()
+                val completeResults = mutableMapOf<String, Map<String, Any>>()
 
-                // Adicione os horários com dados
-                results.forEach { (time, status) ->
-                    completeResults[time] = status
-                }
+                // Adiciona os horários com dados
+                completeResults.putAll(results)
 
-                // Adicione horários padrão que estão faltando
-                standardHours.forEach { hour ->
-                    if (!completeResults.containsKey(hour)) {
-                        completeResults[hour] = 'N'
-                    }
-                }
+                // Ignora dias que só possuem status 'N'
+                if (completeResults.values.all { it["status"] == 'N' }) continue
 
-                // Verifique se todos os horários têm status padrão 'N'
-                val hasOnlyDefaultValues = completeResults.values.all { it == 'N' }
-                if (hasOnlyDefaultValues) {
-                    // Ignorar esse dia, pois ele não tem dados relevantes
-                    continue
-                }
-
-                // Criar o cartão para o dia
+                // Criar card do dia
                 val card = LinearLayout(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        setMargins(32, 24, 32, 24) // Reduzindo largura e espaçamento entre os cartões
+                        setMargins(32, 24, 32, 24)
                     }
                     orientation = LinearLayout.VERTICAL
                     setBackgroundResource(R.drawable.white_rectangle)
                     setPadding(24, 24, 24, 24)
-                    gravity = Gravity.CENTER_HORIZONTAL // Centraliza o conteúdo horizontalmente
+                    gravity = Gravity.CENTER_HORIZONTAL
                 }
 
                 val formattedDate = try {
-                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Formato de entrada
-                    val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Formato de saída
-                    val dateObject = inputFormat.parse(date) // Converte a string para um objeto Date
-                    outputFormat.format(dateObject) // Formata para o formato brasileiro
+                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val dateObject = inputFormat.parse(date)
+                    outputFormat.format(dateObject)
                 } catch (e: Exception) {
-                    date // Retorna o valor original em caso de erro
+                    date
                 }
 
                 val dateTextView = TextView(this).apply {
@@ -114,19 +96,21 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 card.addView(dateTextView)
 
-                // Ordenar os horários antes de exibir
                 val sortedCompleteResults = completeResults.toSortedMap()
 
-                for ((time, status) in sortedCompleteResults) {
+                for ((time, data) in sortedCompleteResults) {
+                    val status = data["status"] as? Char ?: 'I'
+                    val volume = data["volume"] as? Double ?: 0.0
+
                     val row = LinearLayout(this).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         ).apply {
-                            setMargins(0, 8, 0, 8) // Espaçamento entre as linhas
+                            setMargins(0, 8, 0, 8)
                         }
                         orientation = LinearLayout.HORIZONTAL
-                        gravity = Gravity.CENTER_VERTICAL // Garante centralização vertical das linhas
+                        gravity = Gravity.CENTER_VERTICAL
                     }
 
                     val timeTextView = TextView(this).apply {
@@ -138,16 +122,31 @@ class HistoryActivity : AppCompatActivity() {
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             1f
                         ).apply {
-                            marginStart = 16 // Afastar do lado esquerdo
+                            marginStart = 16
                         }
                         gravity = Gravity.CENTER_VERTICAL
                     }
 
+                    // Exibir volume somente se o status for 'S'
+                    val volumeTextView = if (status == 'S') {
+                        TextView(this).apply {
+                            text = "${"%.1f".format(volume)} mL"
+                            textSize = 16f
+                            setTextColor(Color.BLACK)
+                            layoutParams = LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1f
+                            )
+                            gravity = Gravity.CENTER
+                        }
+                    } else null
+
                     val statusIcon = ImageView(this).apply {
                         layoutParams = LinearLayout.LayoutParams(
-                            50, 50 // Tamanho do ícone
+                            50, 50
                         ).apply {
-                            marginEnd = 16 // Espaçamento lateral do ícone
+                            marginEnd = 16
                             gravity = Gravity.CENTER
                         }
                         when (status) {
@@ -158,6 +157,7 @@ class HistoryActivity : AppCompatActivity() {
                     }
 
                     row.addView(timeTextView)
+                    volumeTextView?.let { row.addView(it) } // Adiciona volume somente se for sucesso
                     row.addView(statusIcon)
 
                     card.addView(row)
@@ -167,6 +167,4 @@ class HistoryActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }

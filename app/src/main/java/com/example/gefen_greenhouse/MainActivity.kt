@@ -5,12 +5,15 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityMainBinding
 import java.time.LocalDate
@@ -66,13 +69,15 @@ class MainActivity : AppCompatActivity() {
         val container = binding.dynamicContainer // LinearLayout no XML
         container.removeAllViews() // Limpa as views antigas
 
-        for ((time, status) in irrigationSystem.todayResults.toSortedMap()) {
+        for ((time, data) in irrigationSystem.todayResults.toSortedMap()) {
+            val status = data["status"] as? Char ?: 'I'  // Obtém o status (ou 'I' se não existir)
+            val volume = data["volume"] as? Double ?: 0.0 // Obtém o volume (ou 0.0 se não existir)
 
             // Cria o card
             val card = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    250 // Altura do card
+                    200 // Altura do card
                 ).apply {
                     setMargins(0, 16, 0, 16) // Margens entre os cards
                 }
@@ -87,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                 text = time
                 setTextColor(Color.parseColor("#535353"))
                 alpha = 0.5f
-                textSize = 30f
+                textSize = 28f
                 layoutParams = LinearLayout.LayoutParams(
                     0,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -95,29 +100,56 @@ class MainActivity : AppCompatActivity() {
                 ).apply {
                     marginStart = 24 // Adiciona margem para afastar do canto esquerdo
                 }
-                gravity = Gravity.CENTER_VERTICAL // Garante que o texto do horário fique centralizado verticalmente
+                gravity = Gravity.CENTER_VERTICAL // Centraliza verticalmente
             }
 
-            // Cria o TextView para o status
-            val statusTextView = TextView(this@MainActivity).apply {
-                text = getColoredText(this@MainActivity, irrigationSystem.statusDict[status] ?: R.string.indeterminado) // Aplica o texto formatado
-                textSize = 30f // Tamanho da fonte
-                setTypeface(null, Typeface.BOLD) // Fonte em negrito
+            // Cria um layout vertical para exibir o status e o volume/mensagem de erro
+            val statusContainer = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     0,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    2f // Peso maior para ocupar mais espaço e centralizar no restante do espaço
+                    2f // Peso maior para ocupar mais espaço
                 )
-                gravity = Gravity.CENTER // Centraliza completamente no espaço restante
+                gravity = Gravity.CENTER
             }
 
+            // Cria o TextView para o status
+            val statusTextView = TextView(this).apply {
+                text = getColoredText(this@MainActivity, irrigationSystem.statusDict[status] ?: R.string.indeterminado)
+                textSize = 24f
+                setTypeface(null, Typeface.BOLD)
+                gravity = Gravity.CENTER
+            }
 
-            // Adiciona os TextViews ao card
+            statusContainer.addView(statusTextView) // Adiciona apenas o status
+
+            // Se o status for diferente de 'N' (Aguardando), adiciona uma mensagem abaixo
+            if (status !in listOf('N', 'I')) {
+                val infoTextView = TextView(this).apply {
+                    textSize = 14f
+                    setTextColor(Color.BLACK)
+                    gravity = Gravity.CENTER
+                }
+
+                infoTextView.text = when (status) {
+                    'F' -> "A bomba não ligou."
+                    'S' -> "Volume: ${"%.1f".format(volume)} mL"
+                    else -> "" // Para outros status, não exibe nada
+                }
+
+                statusContainer.addView(infoTextView) // Adiciona a info abaixo do status
+            }
+
+            // Adiciona os elementos ao card
             card.addView(timeTextView)
-            card.addView(statusTextView)
+            card.addView(statusContainer)
 
             // Adiciona o card ao contêiner
             container.addView(card)
         }
     }
+
+
+
 }

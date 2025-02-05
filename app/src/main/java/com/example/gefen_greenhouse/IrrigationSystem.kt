@@ -12,7 +12,7 @@ import java.util.Calendar
 // Classe que abstrai o sistema de irrigação
 class IrrigationSystem : ViewModel() {
 
-    var todayResults: MutableMap<String, Char> = mutableMapOf()
+    var todayResults = mutableMapOf<String, MutableMap<String, Any>>()
     var today: String = getCurrentDate()
     val statusDict = mapOf(
         'N' to R.string.aguardando,
@@ -55,19 +55,26 @@ class IrrigationSystem : ViewModel() {
 
     // Organiza os resultados da leitura de hoje, em um dicionário todayResults.
     fun monitorTodayResults(onUpdate: () -> Unit) {
-        var pendingUpdates = 2 // Contador para rastrear as atualizações pendentes
+        var pendingUpdates = 2 // Contador para rastrear atualizações pendentes
         todayResults.clear()
         today = getCurrentDate()
 
-        // Atualiza os resultados de hoje do nó correspondente
+        // Monitorar os resultados do nó correspondente à data de hoje
         database.child(today).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     for (child in snapshot.children) {
-                        val time = child.key
-                        val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
+                        val time = child.key  // Ex: "08:00"
+
+                        // Recupera status e volume do horário específico
+                        val status = child.child("status").getValue(String::class.java)?.firstOrNull() ?: 'I'
+                        val volume = child.child("volume").getValue(Double::class.java) ?: 0.0
+
                         if (time != null) {
-                            todayResults[time] = status
+                            todayResults[time] = mutableMapOf(
+                                "status" to status,
+                                "volume" to volume
+                            )
                         }
                     }
                     Log.d("Firebase", "Dados do nó $today atualizados: $todayResults")
@@ -95,21 +102,22 @@ class IrrigationSystem : ViewModel() {
         database.child(schedulePath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 for (child in snapshot.children) {
-                    // Essas são as horas de funcionamento definidas no BD
                     val time = child.getValue(String::class.java)
 
                     if (time != null && !todayResults.containsKey(time)) {
-//                        Log.d("000h", "${child.getValue(String::class.java)}")
-                        // É um horário que não tem nenhum valor associado mas existe no BD
                         val timeInSeconds = timeToSeconds(time)
                         if (timeInSeconds != null) {
                             if (getCurrentTimeInSeconds() < timeInSeconds + (5 * 60)) {
-                                todayResults[time] = 'N'
+                                todayResults[time] = mutableMapOf(
+                                    "status" to 'N',
+                                    "volume" to 0.0
+                                )
                             } else {
-                                todayResults[time] = 'I'
+                                todayResults[time] = mutableMapOf(
+                                    "status" to 'I',
+                                    "volume" to 0.0
+                                )
                             }
-//                            Log.d("Firebase", "Valor manual adicionado: $time -> ${todayResults[time]}")
-                            todayResults = todayResults.toSortedMap().toMutableMap()
                         }
                     }
                 }
@@ -162,32 +170,44 @@ class IrrigationSystem : ViewModel() {
     // Funções de Histórico
 
     // Função que organiza e mostra o histórico
-    fun fetchHistory(onComplete: (Map<String, Map<String, Char>>) -> Unit) {
-        val historyResults = mutableMapOf<String, MutableMap<String, Char>>()
+    fun fetchHistory(onComplete: (Map<String, Map<String, Map<String, Any>>>) -> Unit) {
+        val historyResults = mutableMapOf<String, MutableMap<String, Map<String, Any>>>()
 
         // Obter os horários padrão
         getStandardHours { standardHours ->
             val datesToFetch = getLastNDates(30) // Obter os últimos 30 dias, incluindo hoje
             var pendingDates = datesToFetch.size
 
+            // Para cada nó de data, existem nós de horários
             for (date in datesToFetch) {
                 database.child(date).get().addOnSuccessListener { snapshot ->
-                    val resultsForDate = mutableMapOf<String, Char>()
-                    // Adiciona todos os horários que possuem dados no banco
+                    val resultsForDate = mutableMapOf<String, Map<String, Any>>()
+
+                    // Aqui vamos iterar sobre cada horário de uma data
                     if (snapshot.exists()) {
                         for (child in snapshot.children) {
                             val time = child.key
-                            val status = child.getValue(String::class.java)?.firstOrNull() ?: 'I'
+                            val status = child.child("status").getValue(String::class.java)?.firstOrNull() ?: 'I'
+                            val volume = child.child("volume").getValue(Double::class.java) ?: 0.0
+
                             if (time != null) {
-                                resultsForDate[time] = status
+                                resultsForDate[time] = mapOf(
+                                    "status" to status,
+                                    "volume" to volume
+                                )
                             }
                         }
                     }
 
-                    // Adiciona os horários padrão como 'N' apenas se não estiverem nos dados do banco
-                    for (time in standardHours) {
-                        if (!resultsForDate.containsKey(time)) {
-                            resultsForDate[time] = 'N'
+                    // Adiciona os horários padrão como 'N' apenas se não estiverem nos dados do banco no dia de hoje
+                    if (date == today){
+                        for (time in standardHours) {
+                            if (!resultsForDate.containsKey(time)) {
+                                resultsForDate[time] = mapOf(
+                                    "status" to 'N',
+                                    "volume" to 0.0
+                                )
+                            }
                         }
                     }
 
@@ -212,21 +232,7 @@ class IrrigationSystem : ViewModel() {
         }
     }
 
-    // Retorna uma data `n` dias antes de uma data fornecida
-    private fun getLastNDates(n: Int): List<String> {
-        val dates = mutableListOf<String>()
-        val calendar = Calendar.getInstance() // Começa com a data de hoje
-
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        for (i in 0 until n) {
-            dates.add(dateFormat.format(calendar.time)) // Adiciona a data no formato correto
-            calendar.add(Calendar.DAY_OF_YEAR, -1) // Vai para o dia anterior
-        }
-
-        return dates
-    }
-
-    // Função que normaliza com todos os horários da database
+    // Função que retorna os horários de funcionamento definidos em 000h em uma lista
     fun getStandardHours(onComplete: (List<String>) -> Unit) {
         val standardHours = mutableListOf<String>()
         database.child(schedulePath).get().addOnSuccessListener { snapshot ->
@@ -245,6 +251,21 @@ class IrrigationSystem : ViewModel() {
             Log.e("Firebase", "Erro ao acessar o nó 000h: ${exception.message}")
             onComplete(emptyList())
         }
+    }
+
+
+    // Retorna uma data `n` dias antes de uma data fornecida
+    private fun getLastNDates(n: Int): List<String> {
+        val dates = mutableListOf<String>()
+        val calendar = Calendar.getInstance() // Começa com a data de hoje
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        for (i in 0 until n) {
+            dates.add(dateFormat.format(calendar.time)) // Adiciona a data no formato correto
+            calendar.add(Calendar.DAY_OF_YEAR, -1) // Vai para o dia anterior
+        }
+
+        return dates
     }
 
     // Funções de Controle

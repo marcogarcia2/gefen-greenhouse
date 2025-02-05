@@ -1,7 +1,7 @@
 #include <time.h>
 
 // Função que coleta e processa dados do sensor
-char collectData(int final) {
+char collectData(int final, float *volume) {
 
   int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
   int sum = 0;
@@ -9,6 +9,7 @@ char collectData(int final) {
   int time_interval = 500;
   int value, prev_value = 0;
   int threshold = 500;
+  int check = 0;
 
   // Loop principal, que realiza a leitura do sensor
   while (currentTime < final) {
@@ -40,6 +41,7 @@ char collectData(int final) {
     
   }
 
+  *volume = 66.6;
   return 'S';
 }
 
