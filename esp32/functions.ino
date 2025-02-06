@@ -41,7 +41,7 @@ char collectData(int final, float *volume) {
     
   }
 
-  *volume = 66.6;
+  *volume = 687.6;
   return 'S';
 }
 

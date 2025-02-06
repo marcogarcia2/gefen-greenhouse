@@ -8,8 +8,8 @@
 const int pin = 34;
 
 // Margem de tempo, 5 minutos antes do funcionamento da bomba
-// const int offset = 1 * 60;
-const int offset = 5 * 60;
+// const int offset = 30;
+const int offset = 300;
 
 // Variável de tempo atual
 tm timeinfo;
@@ -104,4 +104,5 @@ void setup() {
 
 void loop(){
     // Não utilizado porque estamos usando deep sleep
+    yield();
 }

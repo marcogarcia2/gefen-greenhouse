@@ -7,22 +7,33 @@
 
 // Função que conecta-se ao wifi
 void connectWiFi() {
-  WiFi.begin(ssid, password);
-  Serial.print("Conectando ao WiFi...");
-  
-  int attempts = 0; // Contador de tentativas
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) { // 20 tentativas (~10 segundos)
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nWiFi conectado!");
-    Serial.print("IP: ");
-    Serial.println(WiFi.localIP());
-  } else {
-    Serial.println("\nErro ao conectar ao WiFi!");
+
+  // Três tentativas no total, caso falhe, rebootar e tentar de novo
+  int i = 0;
+  while (i < 3){
+    WiFi.begin(ssid, password);
+    // WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Para redes como EDUROAM
+    Serial.print("Conectando ao WiFi...");
+    
+    int attempts = 0; // Contador de tentativas
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) { // 30 segundos de tentativa, aproximadamente
+      delay(1000);
+      Serial.print(".");
+      attempts++;
+    }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("\nWiFi conectado!");
+      Serial.print("IP: ");
+      Serial.println(WiFi.localIP());
+      break;
+    } 
+    else {
+      Serial.println("\nErro ao conectar ao WiFi!");
+        if (i != 2) Serial.printf("A entativa %d falhou. Conectando novamente...\n", i);
+        else Serial.printf("As três tentativas falharam.");
+    }
+    i++;
   }
 }
 
@@ -65,19 +76,26 @@ int whatToDo(int currentTime){
 // Função que trata os dados e os insere no BD
 bool insertData(int nextTime, char result, float volume){
 
-  // O dado que desejamos inserir é do tipo ("2024-01-09", "08:00", 's')
-  char* date = getDate();
-  char* time = getTimeString(nextTime);
+  char path[60] = "/Estufa/";
+  char aux_path[60];
+  char dateBuffer[15]; 
+  char timeBuffer[10];
 
-  // Serial.printf("Dados a serem inseridos: (%s, %s, %c)\n", date, time, result);
-  
-  char path[25] = "/Estufa/";
-  strcat(path, date);
+  // Pegando o dia de hoje e o horário
+  strcpy(dateBuffer, getDate());
+  strcpy(timeBuffer, getTimeString(nextTime));
+
+  // Sempre reescrevendo o número de vasos para ter redundância
+  strcat(path, dateBuffer);
+  strcpy(aux_path, path);
+  strcat(aux_path, "/vasos");
+  Firebase.setInt(aux_path, Firebase.getInt("Estufa/000v"));
+
+  // Continuando a escrever o path
   strcat(path, "/");
-  strcat(path, time);
+  strcat(path, timeBuffer);
 
   //  O path vai ficar fixo, preciso inserir no status e caso S, volume
-  char aux_path[31];
   strcpy(aux_path, path);
   strcat(aux_path, "/status");
 
@@ -86,6 +104,7 @@ bool insertData(int nextTime, char result, float volume){
 
   // Inserindo o dado de status
   Firebase.setString(aux_path, newResult);
+  Serial.printf("Status inserido com sucesso: %c\n", result);
 
   // Caso seja sucesso, vamos guardar a informação de volume também
   if (result == 'S'){
@@ -96,10 +115,11 @@ bool insertData(int nextTime, char result, float volume){
 
     // Inserindo o dado de volume
     Firebase.setFloat(aux_path, volume);
+    Serial.printf("Volume inserido com sucesso: %f\n", volume);
   }
 
   if(!Firebase.failed()){
-    Serial.println("Dados inseridos com sucesso.");
+    Serial.println("Todos os dados inseridos com sucesso.");
     return true;
   }
   else{
