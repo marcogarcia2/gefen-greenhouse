@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity() {
         container.removeAllViews() // Limpa as views antigas
 
         for ((time, data) in irrigationSystem.todayResults.toSortedMap()) {
+
+            // Ignorando alguns dados não relevantes
+            if (time in listOf("vasos")) continue
+
             val status = data["status"] as? Char ?: 'I'  // Obtém o status (ou 'I' se não existir)
             val volume = data["volume"] as? Double ?: 0.0 // Obtém o volume (ou 0.0 se não existir)
 
@@ -134,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
                 infoTextView.text = when (status) {
                     'F' -> "A bomba não ligou."
-                    'S' -> "Volume: ${"%.1f".format(volume)} mL"
+                    'S' -> "Volume: ${"%.1f".format(volume/irrigationSystem.getNumberOfVases())} mL"
                     else -> "" // Para outros status, não exibe nada
                 }
 

@@ -97,20 +97,31 @@ class HistoryActivity : AppCompatActivity() {
                     date
                 }
 
+                // Data de cada bloco
                 val dateTextView = TextView(this).apply {
-                    text = formattedDate
+                    text = formattedDate // + VASOS DE CADA DIA
                     textSize = 24f
                     setTypeface(null, Typeface.BOLD)
                     setTextColor(Color.parseColor("#194215"))
                 }
                 card.addView(dateTextView)
 
+                // Informação de quantos vasos estavam no experimento em determinado dia
+                val nVases = completeResults["vasos"]?.get("vasos") as? Int
+                val vasesTextView = TextView(this).apply {
+                    text = "${nVases} vasos 🪴"
+                    textSize = 18f
+                    setTypeface(null, Typeface.BOLD)
+                    setTextColor(Color.parseColor("#194215"))
+                }
+                card.addView(vasesTextView)
+
                 val sortedCompleteResults = completeResults.toSortedMap()
 
                 for ((time, data) in sortedCompleteResults) {
 
-                    // Ignora a entrada de total da base
-                    if (time in listOf("total")) continue
+                    // Pega somente os horários da base, ignorando alguns dados
+                    if (time in listOf("total", "vasos")) continue
 
                     val status = data["status"] as? Char ?: 'I'
                     val volume = data["volume"] as? Double ?: 0.0
@@ -141,9 +152,9 @@ class HistoryActivity : AppCompatActivity() {
                     }
 
                     // Exibir volume somente se o status for 'S'
-                    val volumeTextView = if (status == 'S') {
+                    val volumeTextView = if (status == 'S' && nVases != null) {
                         TextView(this).apply {
-                            text = "${"%.1f".format(volume)} mL"
+                            text = "${"%.1f".format(volume/nVases)} mL"
                             textSize = 16f
                             setTextColor(Color.BLACK)
                             layoutParams = LinearLayout.LayoutParams(
@@ -192,15 +203,16 @@ class HistoryActivity : AppCompatActivity() {
                     }
 
                     // Texto do total de volume
-                    val totalTextView = TextView(this).apply {
-                        text = "Total: ${"%.1f".format(totalVolume)} mL"
-                        textSize = 18f
-                        setTypeface(null, Typeface.BOLD)
-                        setTextColor(Color.WHITE)
+                    if(nVases != null) {
+                        val totalTextView = TextView(this).apply {
+                            text = "Total: ${"%.1f".format(totalVolume/nVases)} mL por vaso"
+                            textSize = 18f
+                            setTypeface(null, Typeface.BOLD)
+                            setTextColor(Color.WHITE)
+                        }
+                        // Adiciona o texto ao rodapé verde
+                        totalFooter.addView(totalTextView)
                     }
-
-                    // Adiciona o texto ao rodapé verde
-                    totalFooter.addView(totalTextView)
 
                     // Adiciona o rodapé verde DENTRO do card branco (último item)
                     card.addView(totalFooter)

@@ -13,7 +13,7 @@ import java.util.Calendar
 class IrrigationSystem : ViewModel() {
 
     var todayResults = mutableMapOf<String, MutableMap<String, Any>>()
-    var today: String = getCurrentDate()
+    var today: String = getCurrentDate() // Data de hoje no formato YYYY-MM-DD
     val statusDict = mapOf(
         'N' to R.string.aguardando,
         'S' to R.string.sucesso,
@@ -24,7 +24,11 @@ class IrrigationSystem : ViewModel() {
     private var workingTimes: MutableList<String> = mutableListOf()
     private var database: DatabaseReference
     private var password: String = ""
+    private var numberOfVases: Int = 1
+
     private val schedulePath: String = "000h"
+    private val passwordPath: String = "000p"
+    private val vasesPath: String = "000v"
 
     // Excpetions:
     class TimeAlreadyExistsException(message: String) : Exception(message)
@@ -38,7 +42,7 @@ class IrrigationSystem : ViewModel() {
         database = FirebaseDatabase.getInstance().reference.child("Estufa")
 
         // Pegando a senha do banco de dados
-        database.child("000p").get().addOnSuccessListener { snapshot ->
+        database.child(passwordPath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 password = snapshot.getValue(String::class.java) ?: ""
                 Log.d("SENHA", "Senha obtida com sucesso.")
@@ -48,8 +52,68 @@ class IrrigationSystem : ViewModel() {
         }.addOnFailureListener { exception ->
             Log.e("SENHA", "Erro ao buscar a senha: ${exception.message}")
         }
+
+        database.child(vasesPath).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                numberOfVases = snapshot.getValue(Int::class.java)?: 1
+                Log.d("VASOS", "Número de vasos: " + numberOfVases)
+            } else {
+                Log.d("VASOS", "Chave 000v não encontrada no banco de dados.")
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("VASOS", "Erro ao encontrar o número de vasos: ${exception.message}")
+        }
     }
 
+    // Getters and Setters
+
+    fun getNumberOfVases(): Int {
+        return numberOfVases
+    }
+
+    fun setNumberOfVases(input: Int) {
+        if (input == numberOfVases){
+            Log.d("IrrigationSystem","Número de vasos não alterado.")
+            return
+        }
+        else if (input <= 0) {
+            Log.e("IrrigationSystem", "Valor inválido. Somente é aceito números positivos.")
+            return
+        }
+
+        // Se chegou aqui, é um valor válido, muda no valor padrão e no dia de hoje
+        database.child(vasesPath).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+
+                // Muda o valor padrãp
+                database.child(vasesPath).setValue(input).addOnSuccessListener {
+                    Log.d(
+                        "IrrigationSystem",
+                        "Número de vasos PADRÃO alterado com sucesso em $vasesPath."
+                    )
+
+                    // Atualiza o dia de hoje com o novo valor
+                    database.child(today + "/vasos").setValue(input).addOnSuccessListener {
+                        Log.d(
+                            "IrrigationSystem",
+                            "Número de vasos do dia $today alterado com sucesso."
+                        )
+                    }.addOnFailureListener { exception ->
+                        Log.e(
+                            "IrrigationSystem",
+                            "Erro ao alterar o número de vasos do dia $today: $exception.message"
+                        )
+                    }
+
+                }.addOnFailureListener { exception ->
+                    Log.e(
+                        "IrrigationSystem",
+                        "Erro ao alterar o número de vasos padrão em $vasesPath: $exception.message"
+                    )
+                }
+            }
+        }
+    }
 
     // Funções de Home
 
@@ -187,6 +251,14 @@ class IrrigationSystem : ViewModel() {
                     // Aqui vamos iterar sobre cada horário de uma data
                     if (snapshot.exists()) {
                         for (child in snapshot.children) {
+
+                            // Guarda a informação de quantos vasos tinha naquele dia, sem conflitar com o horário
+                            if (child.key == "vasos") {
+                                val vasos = child.getValue(Int::class.java) ?: 0
+                                resultsForDate["vasos"] = mapOf("vasos" to vasos)
+                                continue
+                            }
+
                             val time = child.key
                             val status = child.child("status").getValue(String::class.java)?.firstOrNull() ?: 'I'
                             val volume = child.child("volume").getValue(Double::class.java) ?: 0.0
