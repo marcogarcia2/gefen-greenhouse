@@ -5,16 +5,13 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.HtmlCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityMainBinding
 import java.time.LocalDate
 
@@ -22,7 +19,7 @@ import java.time.LocalDate
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var irrigationSystem: IrrigationSystem
+//    private lateinit var irrigationSystem: IrrigationSystem
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,21 +29,24 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        window.statusBarColor = Color.parseColor("#194313")
+
         // Inicializando a variável do sistema de irrigação
-        irrigationSystem = ViewModelProvider(this).get(IrrigationSystem::class.java)
+//        irrigationSystem = ViewModelProvider(this)[IrrigationSystem::class.java]
 
         // Monitorando o sistema em tempo real
-        irrigationSystem.monitorTodayResults{updateUI()}
+        IrrigationSystem.monitorTodayResults{updateUI()}
 
         // Configurando o botão de recarregar
         binding.refreshButton.setOnClickListener {
             Log.d("MainActivity", "Recarregando dados...")
-            irrigationSystem.monitorTodayResults { updateUI() } // Força a atualização do banco de dados
+            IrrigationSystem.monitorTodayResults { updateUI() } // Força a atualização do banco de dados
         }
 
         binding.historyButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de histórico")
             val intent = Intent(this, HistoryActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         binding.controlButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de controle")
             val intent = Intent(this, ControlActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         val container = binding.dynamicContainer // LinearLayout no XML
         container.removeAllViews() // Limpa as views antigas
 
-        for ((time, data) in irrigationSystem.todayResults.toSortedMap()) {
+        for ((time, data) in IrrigationSystem.todayResults.toSortedMap()) {
 
             // Ignorando alguns dados não relevantes
             if (time in listOf("vasos")) continue
@@ -79,12 +80,19 @@ class MainActivity : AppCompatActivity() {
 
             // Cria o card
             val card = LinearLayout(this).apply {
+
+                val heightInDp = 100 // Ajuste aqui o valor que fica bom na maioria dos celulares
+                val heightInPx = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, heightInDp.toFloat(), resources.displayMetrics
+                ).toInt()
+
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    200 // Altura do card
+                    heightInPx
                 ).apply {
-                    setMargins(0, 16, 0, 16) // Margens entre os cards
+                    setMargins(0, 16, 0, 16)
                 }
+
                 orientation = LinearLayout.HORIZONTAL
                 setBackgroundResource(R.drawable.white_rectangle)
                 setPadding(24, 24, 24, 24)
@@ -120,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
             // Cria o TextView para o status
             val statusTextView = TextView(this).apply {
-                text = getColoredText(this@MainActivity, irrigationSystem.statusDict[status] ?: R.string.indeterminado)
+                text = getColoredText(this@MainActivity, IrrigationSystem.statusDict[status] ?: R.string.indeterminado)
                 textSize = 24f
                 setTypeface(null, Typeface.BOLD)
                 gravity = Gravity.CENTER
@@ -138,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
                 infoTextView.text = when (status) {
                     'F' -> "A bomba não ligou."
-                    'S' -> "Volume: ${"%.1f".format(volume/irrigationSystem.getNumberOfVases())} mL"
+                    'S' -> "Volume: ${"%.1f".format(volume/IrrigationSystem.getNumberOfVases())} mL"
                     else -> "" // Para outros status, não exibe nada
                 }
 

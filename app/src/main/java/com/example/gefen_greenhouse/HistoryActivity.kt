@@ -12,24 +12,24 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityHistoryBinding
 import java.util.Locale
 
 class HistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryBinding
-    private lateinit var irrigationSystem: IrrigationSystem
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // Criando o binding
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        irrigationSystem = ViewModelProvider(this).get(IrrigationSystem::class.java)
+        window.statusBarColor = Color.parseColor("#194313")
 
         // Buscar o histórico atualizado
-        irrigationSystem.fetchHistory { historyResults ->
+        IrrigationSystem.fetchHistory { historyResults ->
             runOnUiThread {
                 displayHistory(historyResults)
             }
@@ -38,6 +38,7 @@ class HistoryActivity : AppCompatActivity() {
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -45,6 +46,7 @@ class HistoryActivity : AppCompatActivity() {
         binding.controlButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de controle")
             val intent = Intent(this, ControlActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -54,7 +56,7 @@ class HistoryActivity : AppCompatActivity() {
         val container = binding.historyContainer
         container.removeAllViews()
 
-        irrigationSystem.getStandardHours { standardHours ->
+        IrrigationSystem.getStandardHours {
             val sortedHistoryResults = historyResults.toSortedMap(compareByDescending { it })
 
             for ((date, results) in sortedHistoryResults) {
@@ -69,7 +71,6 @@ class HistoryActivity : AppCompatActivity() {
                         val status = timeData["status"] as? Char ?: 'I' // Assume 'I' se o status não existir
                         status == 'N' || status == 'I'
                     }) {
-                    Log.d("HistoryDebug", "Dia ignorado (todos os status são 'N' ou 'I'): $date")
                     continue
                 }
 
@@ -109,7 +110,7 @@ class HistoryActivity : AppCompatActivity() {
                 // Informação de quantos vasos estavam no experimento em determinado dia
                 val nVases = completeResults["vasos"]?.get("vasos") as? Int
                 val vasesTextView = TextView(this).apply {
-                    text = "${nVases} vasos 🪴"
+                    text = "$nVases vasos 🪴"
                     textSize = 18f
                     setTypeface(null, Typeface.BOLD)
                     setTextColor(Color.parseColor("#194215"))

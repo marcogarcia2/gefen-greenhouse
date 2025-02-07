@@ -3,14 +3,13 @@ package com.example.gefen_greenhouse
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.*
-import kotlinx.coroutines.NonCancellable.children
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Calendar
 
-// Classe que abstrai o sistema de irrigação
-class IrrigationSystem : ViewModel() {
+// Classe que abstrai o sistema de irrigação (SINGLETON)
+object IrrigationSystem : ViewModel() {
 
     var todayResults = mutableMapOf<String, MutableMap<String, Any>>()
     var today: String = getCurrentDate() // Data de hoje no formato YYYY-MM-DD
@@ -26,9 +25,9 @@ class IrrigationSystem : ViewModel() {
     private var password: String = ""
     private var numberOfVases: Int = 1
 
-    private val schedulePath: String = "000h"
-    private val passwordPath: String = "000p"
-    private val vasesPath: String = "000v"
+    private const val schedulePath: String = "000h"
+    private const val passwordPath: String = "000p"
+    private const val vasesPath: String = "000v"
 
     // Excpetions:
     class TimeAlreadyExistsException(message: String) : Exception(message)

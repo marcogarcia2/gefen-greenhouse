@@ -8,18 +8,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import android.graphics.Color
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.gefen_greenhouse.databinding.ActivityControlBinding
 
 class ControlActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityControlBinding
-    private lateinit var irrigationSystem: IrrigationSystem
-
     private val bannedTimes = listOf("00:00")
 
     class FillAllFieldsException(message: String) : Exception(message)
@@ -29,18 +23,18 @@ class ControlActivity : AppCompatActivity() {
     class NotMultipleOf10Exception(message: String) : Exception(message)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        // Configurando o ViewBinding
+        // Criando o binding
+        super.onCreate(savedInstanceState)
         binding = ActivityControlBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializando o sistema
-        irrigationSystem = ViewModelProvider(this).get(IrrigationSystem::class.java)
+        window.statusBarColor = Color.parseColor("#194313")
 
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -48,6 +42,7 @@ class ControlActivity : AppCompatActivity() {
         binding.historyButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de histórico")
             val intent = Intent(this, HistoryActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -60,7 +55,7 @@ class ControlActivity : AppCompatActivity() {
             try {
                 verifyInputsToAdd(timeInput, passwordInput)
 
-                irrigationSystem.addTimeToDatabase(
+                IrrigationSystem.addTimeToDatabase(
                     timeInput,
                     onSuccess = {
                         Log.d("Controle", "Horário adicionado com sucesso.")
@@ -71,7 +66,7 @@ class ControlActivity : AppCompatActivity() {
                         binding.editTextTextPassword.text.clear()
 
                         // Mostra os horários atuais atualizados
-                        irrigationSystem.getWorkingTimes { workingTimes ->
+                        IrrigationSystem.getWorkingTimes { workingTimes ->
                             if (workingTimes.isNotEmpty()) {
                                 displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
                             } else {
@@ -101,7 +96,7 @@ class ControlActivity : AppCompatActivity() {
             try {
                 verifyInputsToRemove(timeInput, passwordInput)
 
-                irrigationSystem.removeTimeFromDatabase(
+                IrrigationSystem.removeTimeFromDatabase(
                     timeInput,
                     onSuccess = {
                         Log.d("Controle", "Horário removido com sucesso.")
@@ -112,7 +107,7 @@ class ControlActivity : AppCompatActivity() {
                         binding.editTextTextPassword.text.clear()
 
                         // Mostra os horários atuais atualizados
-                        irrigationSystem.getWorkingTimes { workingTimes ->
+                        IrrigationSystem.getWorkingTimes { workingTimes ->
                             if (workingTimes.isNotEmpty()) {
                                 displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
                             } else {
@@ -135,7 +130,7 @@ class ControlActivity : AppCompatActivity() {
         }
 
         // Mostra os horários atuais
-        irrigationSystem.getWorkingTimes { workingTimes ->
+        IrrigationSystem.getWorkingTimes { workingTimes ->
             if (workingTimes.isNotEmpty()) {
                 displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
             } else {
@@ -180,7 +175,7 @@ class ControlActivity : AppCompatActivity() {
         }
 
         // Por fim, verifica se a senha inserida está correta
-        if (irrigationSystem.validatePassword(passwordInput)){
+        if (IrrigationSystem.validatePassword(passwordInput)){
             Log.d("Controle", "Senha OK")
         }
         else {
@@ -208,7 +203,7 @@ class ControlActivity : AppCompatActivity() {
         }
 
         // Por fim, verifica se a senha inserida está correta
-        if (irrigationSystem.validatePassword(passwordInput)){
+        if (IrrigationSystem.validatePassword(passwordInput)){
             Log.d("Controle", "Senha OK")
         }
         else {
@@ -229,7 +224,7 @@ class ControlActivity : AppCompatActivity() {
     }
 
     // Função dos Toasts
-    fun showToast(message: String) {
+    private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
