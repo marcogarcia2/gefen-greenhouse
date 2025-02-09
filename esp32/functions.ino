@@ -1,48 +1,103 @@
 #include <time.h>
 
+#define PIN 4
+
+
+
+void IRAM_ATTR pulseCounter() {
+  pulseCount++;
+
 // Função que coleta e processa dados do sensor
 char collectData(int final, float *volume) {
 
-  int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
-  int sum = 0;
-  float dxdt = 0;
-  int time_interval = 500;
-  int value, prev_value = 0;
-  int threshold = 500;
-  int check = 0;
+  volatile int pulseCount;
+  const float calibrationFactor = 7.5 * (77.2 / 250);
+  unsigned long oldTime = 0;
+  float flowRate = 0.0;
+  float totalVolume = 0.0;
 
-  // Loop principal, que realiza a leitura do sensor
-  while (currentTime < final) {
+  pinMode(PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
 
-    value = analogRead(pin);
-    sum += value;
+  while(true){
+    if (millis() - oldTime >= 1000){ // A cada 1s 
+      
+      detachInterrupt(digitalPinToInterrupt(PIN));
+      
+      // Calcula a vazão instanânea em mL/min
+      flowRate = (pulseCount / calibrationFactor) * 60.0;
 
-    // Calcula-se a "derivada" dos valores lidos
-    dxdt = (float)(value - prev_value) / (float)time_interval;
-    prev_value = value;
+      // Calcula o volume total escoado (mL)
+      totalVolume += (flowRate / 60.0);
 
-    // A partir do momento que começou a ler um valor alto, caso volte a zero, deve encerrar
-    if (value > threshold && check < 15){
-      check++;
+      Serial.print("Vazão: ");
+      Serial.print(flowRate);
+      Serial.print(" mL/min  |  Volume Total: ");
+      Serial.print(totalVolume);
+      Serial.println(" mL");
+
+      pulseCount = 0;
+      oldTime = millis();
+      totalTime += oldTime;
+
+      attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
     }
 
-
-    Serial.printf("Valor lido pelo sensor: %d\n", value);
-    delay(time_interval);
-
-    // Atualiza o tempo atual
-    if (getLocalTime(&timeinfo)) {
-      currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
-    } 
-    else {
-      Serial.println("Erro ao atualizar o tempo!");
-      return 'I';
+    // Verifica se já ta bom pra acabar
+    if (totalTime > final + offset){
+      return 'F';
     }
-    
+
   }
 
-  *volume = 687.6;
+  *volume = totalVolume;
   return 'S';
+}
+
+// char collectData(int offset, float *volume) {
+  // // Pino de leitura do sensor
+  // const int pin = 4;
+
+  // int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+  // int sum = 0;
+  // float dxdt = 0;
+  // int time_interval = 500;
+  // int value, prev_value = 0;
+  // int threshold = 500;
+  // int check = 0;
+
+  // // Loop principal, que realiza a leitura do sensor
+  // while (currentTime < final) {
+
+  //   value = analogRead(pin);
+  //   sum += value;
+
+  //   // Calcula-se a "derivada" dos valores lidos
+  //   dxdt = (float)(value - prev_value) / (float)time_interval;
+  //   prev_value = value;
+
+  //   // A partir do momento que começou a ler um valor alto, caso volte a zero, deve encerrar
+  //   if (value > threshold && check < 15){
+  //     check++;
+  //   }
+
+
+  //   Serial.printf("Valor lido pelo sensor: %d\n", value);
+  //   delay(time_interval);
+
+  //   // Atualiza o tempo atual
+  //   if (getLocalTime(&timeinfo)) {
+  //     currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
+  //   } 
+  //   else {
+  //     Serial.println("Erro ao atualizar o tempo!");
+  //     return 'I';
+  //   }
+    
+  // }
+
+  // *volume = 687.6;
+  // return 'S';
 }
 
 // Função para colocar ESP32 em deep sleep por um tempo determinado

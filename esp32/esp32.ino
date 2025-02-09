@@ -4,9 +4,6 @@
 
 // --- VARIÁVEIS --- //
 
-// Pino de leitura do sensor
-const int pin = 34;
-
 // Margem de tempo, 5 minutos antes do funcionamento da bomba
 // const int offset = 30;
 const int offset = 300;
