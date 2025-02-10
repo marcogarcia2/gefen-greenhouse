@@ -99,6 +99,12 @@ bool insertData(int nextTime, char result, float volume){
   strcpy(aux_path, path);
   strcat(aux_path, "/status");
 
+  // Antes de inserir, verifica se ele já não existe por segurança
+  if (Firebase.getString(aux_path) == "S"){
+    Serial.println("Dado já existente. A inserção falhou.");
+    return false;
+  }
+
   // Transforma o result em String
   char newResult[2] = {result, '\0'};
 
