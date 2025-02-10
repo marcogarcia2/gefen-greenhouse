@@ -2,15 +2,13 @@
 #include <IOXhop_FirebaseESP32.h>
 #include <ArduinoJson.h>
 
-// --- VARIÁVEIS --- //
+// --- VARIÁVEIS GLOBAIS --- //
 
-// Margem de tempo, 5 minutos antes do funcionamento da bomba
-// const int offset = 30;
-const int offset = 300;
+// Margem de tempo em segundos antes do funcionamento da bomba (5 minutos)
+const unsigned int offset = 300;
 
 // Variável de tempo atual
 tm timeinfo;
-
 
 // --- PROGRAMA PRINCIPAL --- //
 
@@ -21,9 +19,10 @@ void setup() {
   // Conecta ao WiFi para sincronizar o relógio
   connectWiFi();
   configTime(-3 * 3600, 0, "pool.ntp.org"); // Configura NTP com fuso horário de Brasília (-3 horas)
+
   if (!getLocalTime(&timeinfo)) {
-    Serial.println("Erro ao obter horário. Tentando novamente em 15 minutos...");
-    deepSleep(15*60); // Dorme por 15 minutos para tentar novamente
+    Serial.println("Erro ao obter horário. Reiniciando o sistema...");
+    deepSleep(15); // Dorme por 15 segundos para tentar novamente
   }
 
   // Descobrindo o horário atual

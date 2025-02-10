@@ -9,11 +9,15 @@
 void connectWiFi() {
 
   // Três tentativas no total, caso falhe, rebootar e tentar de novo
-  int i = 0;
-  while (i < 3){
+  for (int i = 0; i < 3; i++){
+
+    // Conexão em WiFi tradicional
     WiFi.begin(ssid, password);
-    // WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Para redes como EDUROAM
-    Serial.print("Conectando ao WiFi...");
+
+    // Conexão no eduroam
+    // WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Para redes como eduroam
+    
+    Serial.print("Conectando ao WiFi");
     
     int attempts = 0; // Contador de tentativas
     while (WiFi.status() != WL_CONNECTED && attempts < 30) { // 30 segundos de tentativa, aproximadamente
@@ -22,19 +26,36 @@ void connectWiFi() {
       attempts++;
     }
     
+    // Se a conexão for realizada com sucesso:
     if (WiFi.status() == WL_CONNECTED) {
       Serial.println("\nWiFi conectado!");
       Serial.print("IP: ");
       Serial.println(WiFi.localIP());
       break;
     } 
+
+    // Se não, dá mais chances ou reseta o sistema
     else {
-      Serial.println("\nErro ao conectar ao WiFi!");
-        if (i != 2) Serial.printf("A entativa %d falhou. Conectando novamente...\n", i);
-        else Serial.printf("As três tentativas falharam.");
+        switch(i){
+          case 0: 
+            Serial.println("\nERRO: A primeira tentativa de conexão falhou. Tentando novamente...");
+            break;
+
+          case 1:
+            Serial.println("\nERRO: A segunda tentativa de conexão também falhou. Tentando novamente...");
+            break;
+          
+          case 2:
+            Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 1 minuto...");
+            deepSleep(60);
+            break;
+
+          default:
+            break;
+        }
     }
-    i++;
   }
+
 }
 
 

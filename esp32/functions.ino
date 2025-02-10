@@ -22,7 +22,6 @@ char collectData(int final, float *volume) {
   bool flowStarted = false;
   unsigned long flowStopTime = 0;
 
-
   pinMode(PIN, INPUT_PULLUP);
 
   // Calculando o tempo de escuta do sensor
@@ -32,10 +31,11 @@ char collectData(int final, float *volume) {
   }
   const unsigned int workingTime = final - (timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec);
 
+  // Loop principal de escuta do sensor
   attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
   while(workingTime > totalTime){
     if (millis() - oldTime >= 1000){ // A cada 1s 
-      Serial.printf("wkT = %lu\nttT = %lu\noldT = %lu\n", workingTime, totalTime, oldTime);
+      Serial.printf("wkT = %lu\nttT = %lu\n", workingTime, totalTime);
       detachInterrupt(digitalPinToInterrupt(PIN));
       
       // Calcula a vazão instanânea em mL/min
@@ -63,7 +63,7 @@ char collectData(int final, float *volume) {
 
       pulseCount = 0;
       oldTime = millis();
-      totalTime ++;
+      totalTime++;
 
       attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
     }
@@ -75,7 +75,6 @@ char collectData(int final, float *volume) {
   // Se foi sucesso:
   *volume = totalVolume;
   return 'S';
-
 }
 
 // Função para colocar ESP32 em deep sleep por um tempo determinado
