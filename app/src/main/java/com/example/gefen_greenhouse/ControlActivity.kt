@@ -8,13 +8,17 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.InputType
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gefen_greenhouse.databinding.ActivityControlBinding
 
 class ControlActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityControlBinding
-    private val bannedTimes = listOf("00:00")
+    private val bannedTimes = listOf("23:50", "00:00", "00:10")
 
     class FillAllFieldsException(message: String) : Exception(message)
     class InvalidTimeFormatException(message: String) : Exception(message)
@@ -31,6 +35,8 @@ class ControlActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.parseColor("#194313")
 
+        binding.vasesButton.text = "${IrrigationSystem.getNumberOfVases()} \uD83E\uDEB4"
+
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
@@ -46,6 +52,72 @@ class ControlActivity : AppCompatActivity() {
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
+
+        // Mostra os horários atuais
+        IrrigationSystem.getWorkingTimes { workingTimes ->
+            if (workingTimes.isNotEmpty()) {
+                displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
+            } else {
+                Log.d("ControlActivity", "Nenhum horário encontrado.")
+            }
+        }
+
+        // Listener do botão de alterar vasos
+        binding.vasesButton.setOnClickListener {
+            Log.d("Controle", "Abrindo o forms dos vasos.")
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Digite a quantidade de vasos presentes no experimento:")
+
+            // Criar um layout no código para o formulário
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(20, 20, 20, 20)
+            }
+
+            val editTextQtdVasos = EditText(this).apply {
+                hint = "ex.: 20"
+                inputType = InputType.TYPE_CLASS_NUMBER // Para garantir que o input seja um número
+            }
+            layout.addView(editTextQtdVasos)
+
+            builder.setView(layout)
+
+            builder.setPositiveButton("Enviar") { dialog, which ->
+                val qtdVasos = editTextQtdVasos.text.toString().toInt()
+
+                val oldQtdOfVases = IrrigationSystem.getNumberOfVases()
+
+                // Realiza a troca da quantidade de vasos no BD
+                IrrigationSystem.setNumberOfVases(qtdVasos)
+
+                if (qtdVasos == oldQtdOfVases){
+                    Toast.makeText(this, "A quantidade de vasos já é $qtdVasos!", Toast.LENGTH_LONG).show()
+                }
+                else{
+                    Toast.makeText(this, "Quantidade de vasos definida: $qtdVasos", Toast.LENGTH_LONG).show()
+                }
+
+                binding.vasesButton.text = "${IrrigationSystem.getNumberOfVases()} \uD83E\uDEB4"
+
+            }
+
+            builder.setNegativeButton("Cancelar") { dialog, which ->
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            positiveButton.setTextColor(resources.getColor(R.color.dark_green))  // Define a cor do "Enviar"
+            negativeButton.setTextColor(resources.getColor(R.color.dark_green))  // Define a cor do "Cancelar"
+
+            positiveButton.setTypeface(positiveButton.typeface, Typeface.BOLD)
+            negativeButton.setTypeface(negativeButton.typeface, Typeface.BOLD)
+        }
+
 
         // Listener para o botão Adicionar
         binding.addButton.setOnClickListener {
@@ -126,15 +198,6 @@ class ControlActivity : AppCompatActivity() {
             catch (e: Exception) {
                 Log.d("Controle", "Erro: ${e.message}")
                 showToast(e.message ?: "Erro inesperado.")
-            }
-        }
-
-        // Mostra os horários atuais
-        IrrigationSystem.getWorkingTimes { workingTimes ->
-            if (workingTimes.isNotEmpty()) {
-                displayCurrentSchedule(workingTimes) // Atualiza o layout com os horários
-            } else {
-                Log.d("ControlActivity", "Nenhum horário encontrado.")
             }
         }
     }
@@ -236,7 +299,7 @@ class ControlActivity : AppCompatActivity() {
         for (time in schedule) {
             val timeTextView = TextView(this).apply {
                 text = time
-                textSize = 18f
+                textSize = 20f
                 setTextColor(Color.BLACK)
                 typeface = resources.getFont(R.font.poppins)
                 layoutParams = LinearLayout.LayoutParams(

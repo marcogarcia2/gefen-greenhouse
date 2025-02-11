@@ -72,13 +72,15 @@ object IrrigationSystem : ViewModel() {
 
     fun setNumberOfVases(input: Int) {
         if (input == numberOfVases){
-            Log.d("IrrigationSystem","Número de vasos não alterado.")
+            Log.d("IrrigationSystem","Número de vasos não alterado, pois este já é $input.")
             return
         }
         else if (input <= 0) {
             Log.e("IrrigationSystem", "Valor inválido. Somente é aceito números positivos.")
             return
         }
+
+        numberOfVases = input
 
         // Se chegou aqui, é um valor válido, muda no valor padrão e no dia de hoje
         database.child(vasesPath).get().addOnSuccessListener { snapshot ->

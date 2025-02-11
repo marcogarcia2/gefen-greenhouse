@@ -12,9 +12,6 @@
     tools:context=".MainActivity">
 
 
-    <!-- ScrollView para os elementos dinâmicos -->
-
-
     <ImageButton
         android:id="@+id/refresh_button"
         android:layout_width="48dp"

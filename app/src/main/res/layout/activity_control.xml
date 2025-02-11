@@ -44,17 +44,19 @@
         android:id="@+id/descricao"
         android:layout_width="398dp"
         android:layout_height="66dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
+        android:breakStrategy="simple"
         android:fontFamily="@font/poppins"
+        android:maxLines="2"
         android:text="@string/descricao_controle"
         android:textAlignment="center"
         android:textColor="#194215"
         android:textSize="18sp"
-        android:maxLines="2"
-        android:breakStrategy="simple"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5
+"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titulo" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollViewHorarios" />
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
@@ -114,7 +116,7 @@
         android:id="@+id/editTextText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="ex.: 19:00"
         android:inputType="text"
@@ -180,36 +182,78 @@
         android:id="@+id/controle_subtitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins_bold"
         android:text="@string/controle_subtitulo"
         android:textColor="#194215"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addButton"
+        app:layout_constraintTop_toBottomOf="@+id/titulo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"/>
 
     <ScrollView
         android:id="@+id/scrollViewHorarios"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/controle_subtitulo"
-        app:layout_constraintBottom_toTopOf="@+id/menu_inferior"
-        android:fillViewport="true"
+        android:layout_height="190dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/descricao"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/controle_subtitulo"
         app:layout_constraintVertical_bias="0">
 
         <LinearLayout
             android:id="@+id/linearLayoutHorarios"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:fillViewport="true" />
+            android:fillViewport="true"
+            android:orientation="vertical" />
     </ScrollView>
+
+    <Button
+        android:id="@+id/vasesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="46dp"
+        android:gravity="center"
+        android:hapticFeedbackEnabled="false"
+        android:padding="0dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#194313"
+        app:layout_constraintBottom_toBottomOf="@id/titulo"
+        app:layout_constraintStart_toEndOf="@id/titulo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/titulo"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+
+<!--    Janela Flutuante do Formulário de troca de vasos -->
+    <LinearLayout
+        android:id="@+id/layoutFormulario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"> <!-- Escondido inicialmente -->
+
+        <EditText
+            android:id="@+id/editTextQtdVasos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ex.: 20" />
+
+        <Button
+            android:id="@+id/botaoEnviar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enviar"
+            android:layout_gravity="center"/>
+    </LinearLayout>
 
 
 

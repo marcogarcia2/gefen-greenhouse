@@ -5,6 +5,10 @@
         <item name="android:fontFamily">@font/poppins</item>
     </style>
 
+    <style name="CustomDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <item name="android:textColorPrimary">@color/dark_green</item> <!-- Cor personalizada para o texto do botão -->
+    </style>
+
 </resources>
 
 
