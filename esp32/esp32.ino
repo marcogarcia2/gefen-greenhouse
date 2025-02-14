@@ -22,7 +22,7 @@ void setup() {
 
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Erro ao obter horário. Reiniciando o sistema...");
-    deepSleep(15); // Dorme por 15 segundos para tentar novamente
+    deepSleep(10); // Dorme por 10 segundos para tentar novamente
   }
 
   // Descobrindo o horário atual

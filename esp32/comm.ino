@@ -5,11 +5,13 @@
 
 #include "secret.h"
 
+#define MAX_ATTEMPTS 3
+
 // Função que conecta-se ao wifi
 void connectWiFi() {
 
   // Três tentativas no total, caso falhe, rebootar e tentar de novo
-  for (int i = 0; i < 3; i++){
+  for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++){
 
     // Conexão em WiFi tradicional
     WiFi.begin(ssid, password);
@@ -19,11 +21,11 @@ void connectWiFi() {
     
     Serial.print("Conectando ao WiFi");
     
-    int attempts = 0; // Contador de tentativas
-    while (WiFi.status() != WL_CONNECTED && attempts < 30) { // 30 segundos de tentativa, aproximadamente
+    int i = 0; // Contador de tentativas
+    while (WiFi.status() != WL_CONNECTED && i < 30) { // 30 segundos de tentativa, aproximadamente
       delay(1000);
       Serial.print(".");
-      attempts++;
+      i++;
     }
     
     // Se a conexão for realizada com sucesso:
@@ -36,7 +38,7 @@ void connectWiFi() {
 
     // Se não, dá mais chances ou reseta o sistema
     else {
-        switch(i){
+        switch(attempt){
           case 0: 
             Serial.println("\nERRO: A primeira tentativa de conexão falhou. Tentando novamente...");
             break;
@@ -46,8 +48,8 @@ void connectWiFi() {
             break;
           
           case 2:
-            Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 1 minuto...");
-            deepSleep(60);
+            Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 5 minutos...");
+            deepSleep(5*60);
             break;
 
           default:
@@ -59,7 +61,7 @@ void connectWiFi() {
 }
 
 
-// Função que descobre a ação a ser tomada
+// Função que descobre a ação a ser tomada com base no horário atual
 int whatToDo(int currentTime){
   
   // Path para a leitura dos horários de funcionamento

@@ -12,20 +12,6 @@
     android:translationY="0dp"
     tools:context=".ControlActivity">
 
-    <View
-        android:id="@+id/menu_inferior"
-        android:layout_width="0dp"
-        android:layout_height="115dp"
-        android:layout_gravity="center"
-        android:background="@drawable/rectangle_shape"
-        android:translationY="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
     <TextView
         android:id="@+id/titulo"
         android:layout_width="wrap_content"
@@ -40,23 +26,191 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/descricao"
-        android:layout_width="398dp"
-        android:layout_height="66dp"
-        android:layout_marginTop="10dp"
-        android:breakStrategy="simple"
-        android:fontFamily="@font/poppins"
-        android:maxLines="2"
-        android:text="@string/descricao_controle"
-        android:textAlignment="center"
-        android:textColor="#194215"
-        android:textSize="18sp"
+    <Button
+        android:id="@+id/vasesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="46dp"
+        android:gravity="center"
+        android:hapticFeedbackEnabled="false"
+        android:padding="0dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#194313"
+        app:layout_constraintBottom_toBottomOf="@id/titulo"
+        app:layout_constraintStart_toEndOf="@id/titulo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5
-"
+        app:layout_constraintTop_toTopOf="@id/titulo"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+<!--    -->
+
+    <!-- ScrollView para o Conteúdo Principal -->
+    <ScrollView
+        android:id="@+id/scrollViewPrincipal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/titulo"
+        app:layout_constraintBottom_toTopOf="@id/menu_inferior"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollViewHorarios" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Subtítulo -->
+            <TextView
+                android:id="@+id/controle_subtitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/controle_subtitulo"
+                android:textColor="#194215"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal" />
+
+            <!-- Horários -->
+            <ScrollView
+                android:id="@+id/scrollViewHorarios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutHorarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </ScrollView>
+
+            <!-- Descrição -->
+            <TextView
+                android:id="@+id/descricao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:breakStrategy="simple"
+                android:fontFamily="@font/poppins"
+                android:maxLines="2"
+                android:text="@string/descricao_controle"
+                android:textAlignment="center"
+                android:textColor="#194215"
+                android:textSize="18sp" />
+
+            <!-- Campos de Entrada -->
+            <EditText
+                android:id="@+id/editTextText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:ems="10"
+                android:hint="ex.: 19:00"
+                android:inputType="text"
+                android:textColor="#000000"
+                android:textColorHighlight="#000000"
+                android:textColorHint="#B4949494"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/editTextTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:ems="10"
+                android:hint="Senha"
+                android:inputType="textPassword"
+                android:textColor="#000000"
+                android:textColorHighlight="#000000"
+                android:textColorHint="#B4949494"
+                android:textSize="20sp" />
+
+            <!-- Botões de Ação -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/addButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="#B5E3B1"
+                    android:text="ADICIONAR"
+                    android:textColor="#194215"
+                    app:strokeColor="#194215"
+                    app:strokeWidth="3sp" />
+
+                <Button
+                    android:id="@+id/removeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="#194215"
+                    android:text="REMOVER"
+                    android:textColor="#B5E3B1"
+                    app:strokeColor="#B5E3B1"
+                    app:strokeWidth="1sp" />
+            </LinearLayout>
+
+            <!-- Janela Flutuante do Formulário de Troca de Vasos -->
+            <LinearLayout
+                android:id="@+id/layoutFormulario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/editTextQtdVasos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="ex.: 20" />
+
+                <Button
+                    android:id="@+id/botaoEnviar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enviar"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+
+    <View
+        android:id="@+id/menu_inferior"
+        android:layout_width="0dp"
+        android:layout_height="125dp"
+        android:layout_gravity="top"
+        android:background="@drawable/rectangle_shape"
+        android:translationY="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
@@ -112,148 +266,8 @@
 
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/editTextText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="ex.: 19:00"
-        android:inputType="text"
-        android:textColor="#000000"
-        android:textColorHighlight="#000000"
-        android:textColorHint="#B4949494"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descricao" />
-
-    <EditText
-        android:id="@+id/editTextTextPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:ems="10"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        android:textColor="#000000"
-        android:textColorHighlight="#000000"
-        android:textColorHint="#B4949494"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText" />
-
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginHorizontal="8dp"
-        android:backgroundTint="#B5E3B1"
-        android:text="ADICIONAR"
-        android:textColor="#194215"
-        app:layout_constraintEnd_toStartOf="@+id/removeButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:strokeColor="#194215"
-        app:strokeWidth="3sp" />
-
-    <Button
-        android:id="@+id/removeButton"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginHorizontal="8dp"
-        android:backgroundTint="#194215"
-        android:text="REMOVER"
-        android:textColor="#B5E3B1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addButton"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:strokeColor="#B5E3B1"
-        app:strokeWidth="1sp" />
-
-    <TextView
-        android:id="@+id/controle_subtitulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/poppins_bold"
-        android:text="@string/controle_subtitulo"
-        android:textColor="#194215"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titulo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
-
-    <ScrollView
-        android:id="@+id/scrollViewHorarios"
-        android:layout_width="0dp"
-        android:layout_height="190dp"
-        android:layout_marginTop="8dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@+id/descricao"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/controle_subtitulo"
-        app:layout_constraintVertical_bias="0">
-
-        <LinearLayout
-            android:id="@+id/linearLayoutHorarios"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true"
-            android:orientation="vertical" />
-    </ScrollView>
-
-    <Button
-        android:id="@+id/vasesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="46dp"
-        android:gravity="center"
-        android:hapticFeedbackEnabled="false"
-        android:padding="0dp"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:backgroundTint="#194313"
-        app:layout_constraintBottom_toBottomOf="@id/titulo"
-        app:layout_constraintStart_toEndOf="@id/titulo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/titulo"
-        app:layout_constraintHorizontal_bias="0.5" />
 
 
-<!--    Janela Flutuante do Formulário de troca de vasos -->
-    <LinearLayout
-        android:id="@+id/layoutFormulario"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:visibility="gone"> <!-- Escondido inicialmente -->
-
-        <EditText
-            android:id="@+id/editTextQtdVasos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="ex.: 20" />
-
-        <Button
-            android:id="@+id/botaoEnviar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Enviar"
-            android:layout_gravity="center"/>
-    </LinearLayout>
 
 
 

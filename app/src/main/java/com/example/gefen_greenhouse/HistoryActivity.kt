@@ -59,6 +59,22 @@ class HistoryActivity : AppCompatActivity() {
         IrrigationSystem.getStandardHours {
             val sortedHistoryResults = historyResults.toSortedMap(compareByDescending { it })
 
+            // Verifica se existem dados a serem exibidos
+            val flag = isNotEmpty(sortedHistoryResults)
+            if (!flag) {
+                Log.d("VAZIO", "Sem dados do tipo status.")
+                val noDataTextView = TextView(this).apply {
+                    text = resources.getString(R.string.no_data)
+                    textSize = 20f
+                    setTextColor(Color.parseColor("#383838"))
+                    typeface = resources.getFont(R.font.poppins)
+                    gravity = Gravity.CENTER
+                }
+                container.addView(noDataTextView)
+                // Encerra esta função
+                return@getStandardHours
+            }
+
             for ((date, results) in sortedHistoryResults) {
 
                 val completeResults = mutableMapOf<String, Map<String, Any>>()
@@ -224,4 +240,13 @@ class HistoryActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun isNotEmpty(historyResults: Map<String, Map<String, Map<String, Any>>>): Boolean {
+        return historyResults.any { (_, outerMap) ->
+            outerMap.any { (_, innerMap) ->
+                innerMap.values.any { it is Char && (it == 'S' || it == 'F') }
+            }
+        }
+    }
 }
+

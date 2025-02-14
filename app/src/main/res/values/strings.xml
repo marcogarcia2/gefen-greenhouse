@@ -11,6 +11,7 @@
     <string name="aguardando"><font color="ABABAB">Aguardando</font></string>
     <string name="indeterminado"><font color="245DD9">Indeterminado</font></string>
     <string name="controle_subtitulo">Horários Atuais</string>
+    <string name="no_data">Não há dados a serem exibidos.</string>
 
 </resources>
 
