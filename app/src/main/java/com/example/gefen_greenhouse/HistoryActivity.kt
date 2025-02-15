@@ -26,7 +26,8 @@ class HistoryActivity : AppCompatActivity() {
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = Color.parseColor("#194313")
+        window.statusBarColor = Color.parseColor("#BCEDB7")
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_green)
 
         // Buscar o histórico atualizado
         IrrigationSystem.fetchHistory { historyResults ->

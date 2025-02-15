@@ -40,6 +40,14 @@ object IrrigationSystem : ViewModel() {
         // Inicializando o Firebase Database
         database = FirebaseDatabase.getInstance().reference.child("Estufa")
 
+        // Pega os dados sensíveis do BD
+        getPasswordFromDatabase()
+        getVasesFromDatabase()
+
+    }
+
+    // Funções que acessam a database
+    private fun getPasswordFromDatabase(){
         // Pegando a senha do banco de dados
         database.child(passwordPath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
@@ -51,7 +59,8 @@ object IrrigationSystem : ViewModel() {
         }.addOnFailureListener { exception ->
             Log.e("SENHA", "Erro ao buscar a senha: ${exception.message}")
         }
-
+    }
+    private fun getVasesFromDatabase(){
         database.child(vasesPath).get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
                 numberOfVases = snapshot.getValue(Int::class.java)?: 1
@@ -459,5 +468,12 @@ object IrrigationSystem : ViewModel() {
             Log.e("IrrigationSystem", "Erro ao acessar o banco de dados: ${exception.message}")
             onComplete(emptyList()) // Retorna lista vazia em caso de erro
         }
+    }
+
+    // Funções que atualizam em tempo real os dados do BD para a instância do objeto
+    fun refreshData(){
+        getPasswordFromDatabase()
+        getVasesFromDatabase()
+        return
     }
 }

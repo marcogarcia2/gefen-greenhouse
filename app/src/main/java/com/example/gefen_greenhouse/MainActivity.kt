@@ -12,6 +12,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.example.gefen_greenhouse.databinding.ActivityMainBinding
 import java.time.LocalDate
 
@@ -29,7 +32,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = Color.parseColor("#194313")
+        window.statusBarColor = Color.parseColor("#BCEDB7")
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_green)
 
         // Inicializando a variável do sistema de irrigação
 //        irrigationSystem = ViewModelProvider(this)[IrrigationSystem::class.java]
@@ -61,6 +65,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
+
+        // Update nos dados sensíveis
+        IrrigationSystem.refreshData()
+
         // Exibindo a data de hoje
         val today = LocalDate.now()
         val day = today.dayOfMonth

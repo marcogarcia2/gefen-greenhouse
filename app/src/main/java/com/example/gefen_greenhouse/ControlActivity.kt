@@ -13,6 +13,7 @@ import android.text.InputType
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.gefen_greenhouse.databinding.ActivityControlBinding
 
 class ControlActivity : AppCompatActivity() {
@@ -33,7 +34,8 @@ class ControlActivity : AppCompatActivity() {
         binding = ActivityControlBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = Color.parseColor("#194313")
+        window.statusBarColor = Color.parseColor("#BCEDB7")
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_green)
 
         binding.vasesButton.text = "${IrrigationSystem.getNumberOfVases()} \uD83E\uDEB4"
 
