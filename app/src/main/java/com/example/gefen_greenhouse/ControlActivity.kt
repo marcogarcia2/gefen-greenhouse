@@ -35,7 +35,7 @@ class ControlActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         window.statusBarColor = Color.parseColor("#BCEDB7")
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_green)
+        window.navigationBarColor = Color.parseColor("#000000")
 
         binding.vasesButton.text = "${IrrigationSystem.getNumberOfVases()} \uD83E\uDEB4"
 

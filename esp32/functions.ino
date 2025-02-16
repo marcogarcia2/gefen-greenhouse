@@ -12,7 +12,7 @@ void IRAM_ATTR pulseCounter() {
 char collectData(int final, float *volume) {
 
   // Variáveis de controle
-  const float calibrationFactor = 2.22;
+  const float calibrationFactor = 2.22; // 2.35
   unsigned long oldTime = 0;
   unsigned int totalTime = 0;
   float flowRate = 0.0;
@@ -35,7 +35,7 @@ char collectData(int final, float *volume) {
   attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
   while(workingTime > totalTime){
     if (millis() - oldTime >= 1000){ // A cada 1s 
-      Serial.printf("wkT = %lu\nttT = %lu\n", workingTime, totalTime);
+      Serial.printf("Tempo: %lu/%lu\n", workingTime, totalTime);
       detachInterrupt(digitalPinToInterrupt(PIN));
       
       // Calcula a vazão instanânea em mL/min

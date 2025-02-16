@@ -1,6 +1,6 @@
 #include <time.h>
-#include <IOXhop_FirebaseESP32.h>
-#include <ArduinoJson.h>
+// #include <IOXhop_FirebaseESP32.h>
+// #include <ArduinoJson.h>
 
 // --- VARIÁVEIS GLOBAIS --- //
 
@@ -22,7 +22,7 @@ void setup() {
 
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Erro ao obter horário. Reiniciando o sistema...");
-    deepSleep(10); // Dorme por 10 segundos para tentar novamente
+    deepSleep(5); // Dorme por 10 segundos para tentar novamente
   }
 
   // Descobrindo o horário atual

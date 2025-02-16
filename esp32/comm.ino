@@ -22,7 +22,7 @@ void connectWiFi() {
     Serial.print("Conectando ao WiFi");
     
     int i = 0; // Contador de tentativas
-    while (WiFi.status() != WL_CONNECTED && i < 30) { // 30 segundos de tentativa, aproximadamente
+    while (WiFi.status() != WL_CONNECTED && i < 30) { // 100 segundos de tentativa, aproximadamente
       delay(1000);
       Serial.print(".");
       i++;
@@ -37,25 +37,28 @@ void connectWiFi() {
     } 
 
     // Se não, dá mais chances ou reseta o sistema
-    else {
-        switch(attempt){
-          case 0: 
-            Serial.println("\nERRO: A primeira tentativa de conexão falhou. Tentando novamente...");
-            break;
+    // else {
 
-          case 1:
-            Serial.println("\nERRO: A segunda tentativa de conexão também falhou. Tentando novamente...");
-            break;
-          
-          case 2:
-            Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 5 minutos...");
-            deepSleep(5*60);
-            break;
+    WiFi.disconnect();
+    
+    switch(attempts){
+      case 0: 
+        Serial.println("\nERRO: A primeira tentativa de conexão falhou. Tentando novamente...");
+        break;
 
-          default:
-            break;
-        }
+      case 1:
+        Serial.println("\nERRO: A segunda tentativa de conexão também falhou. Tentando novamente...");
+        break;
+      
+      case 2:
+        Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 5 minutos...");
+        deepSleep(5*60);
+        break;
+
+      default:
+        break;
     }
+    
   }
 
 }
