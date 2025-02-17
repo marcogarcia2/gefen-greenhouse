@@ -44,7 +44,6 @@
         app:layout_constraintTop_toTopOf="@id/titulo"
         app:layout_constraintHorizontal_bias="0.5" />
 
-<!--    -->
 
     <!-- ScrollView para o Conteúdo Principal -->
     <ScrollView
@@ -52,6 +51,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/titulo"
         app:layout_constraintBottom_toTopOf="@id/menu_inferior"

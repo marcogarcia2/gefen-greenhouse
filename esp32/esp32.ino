@@ -17,13 +17,16 @@ void setup() {
   Serial.begin(115200);
 
   // Conecta ao WiFi para sincronizar o relógio
-  connectWiFi();
+  while (!connectWiFi());
+
   configTime(-3 * 3600, 0, "pool.ntp.org"); // Configura NTP com fuso horário de Brasília (-3 horas)
 
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Erro ao obter horário. Reiniciando o sistema...");
     deepSleep(5); // Dorme por 10 segundos para tentar novamente
   }
+
+  blueLED(true);
 
   // Descobrindo o horário atual
   int currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
@@ -66,6 +69,9 @@ void setup() {
   else {
     Serial.println("Falha no sensor! Enviando dados ao servidor...");
   }
+
+  // Garante que a conexão WiFi existe
+  reconnectWiFi();
 
   insertData(nextTime, result, volume);
   Serial.println("Acabou, vou voltar a dormir.");

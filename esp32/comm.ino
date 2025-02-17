@@ -8,7 +8,7 @@
 #define MAX_ATTEMPTS 3
 
 // Função que conecta-se ao wifi
-void connectWiFi() {
+bool connectWiFi() {
 
   // Três tentativas no total, caso falhe, rebootar e tentar de novo
   for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++){
@@ -33,34 +33,40 @@ void connectWiFi() {
       Serial.println("\nWiFi conectado!");
       Serial.print("IP: ");
       Serial.println(WiFi.localIP());
-      break;
+      return true;
     } 
 
-    // Se não, dá mais chances ou reseta o sistema
-    // else {
+    // Se não, dá mais chances ou reseta o sistema (else)
 
     WiFi.disconnect();
     
     switch(attempts){
       case 0: 
-        Serial.println("\nERRO: A primeira tentativa de conexão falhou. Tentando novamente...");
+        Serial.println("\nERRO: A primeira tentativa de conexão falhou.");
         break;
 
       case 1:
-        Serial.println("\nERRO: A segunda tentativa de conexão também falhou. Tentando novamente...");
+        Serial.println("\nERRO: A segunda tentativa de conexão também falhou.");
         break;
       
       case 2:
-        Serial.println("\nERRO: A última tentativa de conexaão também falhou. Tentando novamente em 5 minutos...");
-        deepSleep(5*60);
+        Serial.println("\nERRO: A última tentativa de conexaão também falhou. Vamos tentar novamente...");
         break;
 
       default:
         break;
-    }
-    
+    } 
   }
+  
+  return false;
+}
 
+
+// Função que tenta se reconectar ao wifi, somente caso esse tenha caído.
+void reconnectWiFi(){
+  if(WiFi.status() != WL_CONNECTED){
+    while(!connectWiFi());
+  }
 }
 
 

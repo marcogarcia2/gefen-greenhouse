@@ -95,6 +95,9 @@ class ControlActivity : AppCompatActivity() {
                 if (qtdVasos == oldQtdOfVases){
                     Toast.makeText(this, "A quantidade de vasos já é $qtdVasos!", Toast.LENGTH_LONG).show()
                 }
+                else if (qtdVasos == 0){
+                    Toast.makeText(this, "O número de vasos não pode ser zero.", Toast.LENGTH_LONG).show()
+                }
                 else{
                     Toast.makeText(this, "Quantidade de vasos definida: $qtdVasos", Toast.LENGTH_LONG).show()
                 }
