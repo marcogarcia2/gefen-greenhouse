@@ -13,7 +13,6 @@ import android.text.InputType
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.gefen_greenhouse.databinding.ActivityControlBinding
 
 class ControlActivity : AppCompatActivity() {
@@ -42,7 +41,6 @@ class ControlActivity : AppCompatActivity() {
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -50,7 +48,6 @@ class ControlActivity : AppCompatActivity() {
         binding.historyButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de histórico")
             val intent = Intent(this, HistoryActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }

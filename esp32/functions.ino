@@ -9,14 +9,15 @@ void IRAM_ATTR pulseCounter() {
 }
 
 // Função que coleta e processa dados do sensor
-char collectData(int final, float *volume) {
+char collectData(int currentTime, int finalTime, float *volume) {
 
   // Variáveis de controle
-  const float calibrationFactor = 2.273; // 2.35
+  const float calibrationFactor = 2.273;
   unsigned long oldTime = 0;
   unsigned int totalTime = 0;
   float flowRate = 0.0;
   float totalVolume = 0.0;
+  const unsigned int workingTime = finalTime - currentTime;
 
   // Variáveis de otimização do tempo
   bool flowStarted = false;
@@ -24,17 +25,11 @@ char collectData(int final, float *volume) {
 
   pinMode(PIN, INPUT_PULLUP);
 
-  // Calculando o tempo de escuta do sensor
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("Erro ao obter horário. Reiniciando o sistema...");
-    deepSleep(15); // Dorme por 15 segundos para tentar novamente
-  }
-  const unsigned int workingTime = final - (timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec);
-
   // Loop principal de escuta do sensor
   attachInterrupt(digitalPinToInterrupt(PIN), pulseCounter, FALLING);
   while(workingTime > totalTime){
     if (millis() - oldTime >= 1000){ // A cada 1s 
+      
       Serial.printf("Tempo: %lu/%lu\n", totalTime, workingTime);
       detachInterrupt(digitalPinToInterrupt(PIN));
       
@@ -44,14 +39,10 @@ char collectData(int final, float *volume) {
       // Calcula o volume total escoado (mL)
       totalVolume += (flowRate / 60.0);
 
-      Serial.print("Vazão: ");
-      Serial.print(flowRate);
-      Serial.print(" mL/min  |  Volume Total: ");
-      Serial.print(totalVolume);
-      Serial.println(" mL");
+      printData(flowRate, totalVolume);
 
       // Otimização, a função pode desligar antes do tempo.
-      if (flowRate < 100.0){
+      if (flowRate < 300.0){
         if (flowStarted && millis() - flowStopTime >= 60000){
           break;
         }
@@ -159,6 +150,16 @@ void blueLED(bool status){
   pinMode(2, OUTPUT);
   if (status) digitalWrite(2, HIGH);
   else digitalWrite(2, LOW);
+}
+
+
+// Função para para exibir (debug)
+void printData(const float flowRate, const float totalVolume){
+  Serial.print("Vazão: ");
+  Serial.print(flowRate);
+  Serial.print(" mL/min  |  Volume Total: ");
+  Serial.print(totalVolume);
+  Serial.println(" mL");
 }
 
 

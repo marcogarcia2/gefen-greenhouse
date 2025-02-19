@@ -48,31 +48,35 @@ void setup() {
   // Precisamos saber se falta muito ou se já está na hora
 
   // 2. Ainda não está na hora, precisa dormir
-  if (currentTime < nextTime - offset){
-    int sleepTime = nextTime - offset - currentTime;
+  if (currentTime < nextTime - (2*offset)){
+    int sleepTime = nextTime - (2*offset) - currentTime;
     Serial.printf("Está cedo ainda, dormindo até %s, por %d segundos...\n", getTimeString(nextTime), sleepTime);
     deepSleep(sleepTime);
   }
 
   // 3. Está na hora certa, vamos coletar os dados
-  Serial.println("Chegou a hora! Vou coletar os dados do sensor.");
+  
+  // Se estiver cedo demais, vamos dar um delay para ligar somente 120 segundos antes
+  int t = nextTime - 120;
+  if (currentTime < t){
+    int delayTime = t - currentTime;
+    Serial.printf("Agurdando %d segundos até a hora da coleta!\n", delayTime);
+    delay(1000 * delayTime);
+    currentTime += (delayTime);
+  }
+
+  Serial.println("Chegou a hora! Coletando dados do sensor.");
   float volume = 0.0;
-  char result = collectData(nextTime + offset, &volume);
+  char result = collectData(currentTime, nextTime + offset, &volume);
 
   // Agora precisamos enviar o dado coletado ao BD
-  if (result == 'S'){
-    Serial.println("Sucesso! Enviando dados ao servidor...");
-  }
-  else if (result == 'F'){
-    Serial.println("Falhou! Enviando dados ao servidor...");
-  }
-  else {
-    Serial.println("Falha no sensor! Enviando dados ao servidor...");
-  }
-
+  if (result == 'S') Serial.println("Sucesso! Enviando dados ao servidor...");
+  else Serial.println("Falhou! Enviando dados ao servidor...");
+  
   // Garante que a conexão WiFi existe
   reconnectWiFi();
 
+  // Insere os dados no BD 
   insertData(nextTime, result, volume);
   Serial.println("Acabou, vou voltar a dormir.");
 
@@ -83,8 +87,8 @@ void setup() {
     currentTime = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
   }
   else{
-    Serial.println("Erro ao obter horário. Tentando novamente em 15 minutos...");
-    deepSleep(15*60);
+    Serial.println("Erro ao obter horário. Tentando novamente...");
+    deepSleep(5);
   } 
 
   nextTime = whatToDo(currentTime);

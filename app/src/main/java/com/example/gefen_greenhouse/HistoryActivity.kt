@@ -4,12 +4,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.icu.text.SimpleDateFormat
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.gefen_greenhouse.databinding.ActivityHistoryBinding
@@ -19,6 +21,7 @@ class HistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryBinding
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // Criando o binding
@@ -39,7 +42,6 @@ class HistoryActivity : AppCompatActivity() {
         binding.homeButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de home")
             val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -47,12 +49,12 @@ class HistoryActivity : AppCompatActivity() {
         binding.controlButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de controle")
             val intent = Intent(this, ControlActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun displayHistory(historyResults: Map<String, Map<String, Map<String, Any>>>) {
         val container = binding.historyContainer
         container.removeAllViews()
@@ -66,8 +68,8 @@ class HistoryActivity : AppCompatActivity() {
                 Log.d("VAZIO", "Sem dados do tipo status.")
                 val noDataTextView = TextView(this).apply {
                     text = resources.getString(R.string.no_data)
-                    textSize = 20f
-                    setTextColor(Color.parseColor("#383838"))
+                    textSize = 14f
+                    setTextColor(Color.parseColor("#6A6A6A"))
                     typeface = resources.getFont(R.font.poppins)
                     gravity = Gravity.CENTER
                 }
@@ -127,7 +129,8 @@ class HistoryActivity : AppCompatActivity() {
                 // Informação de quantos vasos estavam no experimento em determinado dia
                 val nVases = completeResults["vasos"]?.get("vasos") as? Int
                 val vasesTextView = TextView(this).apply {
-                    text = "$nVases vasos 🪴"
+                    if (nVases == 1) text = "$nVases vaso 🪴"
+                    else text = "$nVases vasos 🪴"
                     textSize = 18f
                     setTypeface(null, Typeface.BOLD)
                     setTextColor(Color.parseColor("#194215"))

@@ -12,9 +12,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import com.example.gefen_greenhouse.databinding.ActivityMainBinding
 import java.time.LocalDate
 
@@ -50,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         binding.historyButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de histórico")
             val intent = Intent(this, HistoryActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
@@ -58,12 +54,12 @@ class MainActivity : AppCompatActivity() {
         binding.controlButton.setOnClickListener {
             Log.d("ActivityMain", "Mudando para a tela de controle")
             val intent = Intent(this, ControlActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             overridePendingTransition(0, 0)
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateUI() {
 
         // Update nos dados sensíveis
